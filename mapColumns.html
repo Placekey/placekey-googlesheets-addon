@@ -1,0 +1,430 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <base target="_top" />
+    <link rel="stylesheet" href="https://ssl.gstatic.com/docs/script/css/add-ons1.css">
+    <link href="https://fonts.googleapis.com/css2?family=Spartan:wght@350&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
+    <style>
+        body {
+            padding: 20px;
+            overflow-x: hidden;
+            font-family: 'Spartan', sans-serif;
+        }
+        
+        #generate {
+            background-color: black !important;
+            color: white;
+            margin-top: 5px;
+            text-align: center;
+            padding: 8px 48px;
+            border-radius: 3px;
+            margin-bottom: 5px;
+        }
+        
+        #generate:hover,
+        #generate1:hover {
+            text-decoration: none;
+        }
+        
+        #bottomLinks {
+            position: relative;
+            margin-top: 2rem;
+            display: flex;
+            justify-content: space-around;
+        }
+        
+        #bottomLinks a {
+            text-decoration: wavy;
+            color: #139df2;
+            margin-bottom: 8px;
+            font-size: .8rem;
+            font-weight: 900;
+        }
+        
+        #bottomHr {
+            position: relative;
+            width: 83%;
+            padding: .1px;
+            background-color: black;
+            margin-bottom: 45px;
+        }
+        
+        select {
+            width: 95% !important;
+            background: url(https://ssl.gstatic.com/ui/v1/disclosure/grey-disclosure-arrow-up-down.png), -webkit-linear-gradient(top, #fff, #fff);
+            background-repeat: no-repeat;
+            background-position: 95% 50%;
+            font-family: 'Spartan', sans-serif;
+        }
+        
+        select:hover,
+        select:active {
+            background-image: url(https://ssl.gstatic.com/ui/v1/disclosure/grey-disclosure-arrow-up-down.png), -webkit-linear-gradient(top, #fff, #fff);
+        }
+        
+        .selectors i {
+            color: black;
+            font-size: .5rem;
+            font-weight: bold;
+        }
+        
+        .selectors label {
+            color: black;
+            font-size: .7rem;
+            position: relative;
+            top: 10px;
+            left: 8px;
+            padding: 0px 3px;
+            background-color: white;
+        }
+        
+        #matches label {
+            font-size: .65rem;
+        }
+        
+        #spinner {
+            animation: spin 1s infinite linear;
+            height: 24px;
+            width: 24px;
+            margin: auto;
+        }
+        
+        @keyframes spin {
+            from {
+                transform: rotate(0deg);
+            }
+            to {
+                transform: rotate(360deg);
+            }
+        }
+        
+        .clear {
+            clear: both;
+        }
+    </style>
+    <script>
+        function insert() {
+            //  google.script.run.withSuccessHandler(google.script.host.close).setUserProperties(els);
+        }
+    </script>
+</head>
+
+<body>
+    <p style="display: none">
+        Placekey gets your address and generates a unique identifier for it. To start select a sheet which contains your addresses.
+    </p>
+    <center>
+        <input id="key" type="text" spellcheck="false" style="
+          display: none;
+          width: 200px;
+          height: 25px;
+          font-size: 12px;
+          font-family: monospace;" value="Sheet1" disabled/>
+    </center>
+
+
+    <div id="emptySheet" style="display: none">
+        <div id="emptySheet" style="margin-top: 10px; padding: 10px;">
+            <span style="font-weight: 600;">This Sheet looks empty.</span><br> Fill with sample data?
+        </div>
+        <br />
+        <a id="generate" onclick="insertSample()" class="action">
+          Fill with sample data
+        </a>
+    </div>
+
+    <div id="mapTitle" style="display: none;">
+        <p style="margin-top: 0px; margin-bottom: 10px; font-weight: bold;">Data Location:</p>
+        <select name="sheets" id="sheets" onChange="changeSheet()">
+            <option value="Sheet1">Sheet1</option>
+            <option value="Sheet1">Sheet1</option>
+            <option value="Sheet1">Sheet1</option>
+            <option value="Sheet1">Sheet1</option>
+        </select><br><br><br>
+        <div class="selectors">
+            <div><b>Match the headers in your document to the fields below.</b></div>
+            <label for="selectCols">Street Address</label>
+            <select class="selectCols">
+              <option value="Sheet1">Sheet1</option>
+              <option value="Sheet1">Sheet1</option>
+              <option value="Sheet1">Sheet1</option>
+              <option value="Sheet1">Sheet1</option>
+            </select>
+            <i style="color: #696464; padding-left: 9px"> "598 Portola Dr" </i><br>
+
+            <label for="selectCols">City</label>
+            <select class="selectCols">
+              <option value="Sheet1">Sheet1</option>
+              <option value="Sheet1">Sheet1</option>
+              <option value="Sheet1">Sheet1</option>
+              <option value="Sheet1">Sheet1</option>
+            </select>
+            <i style="color: #696464; padding-left: 9px"> "San Fransisco" </i><br>
+
+            <label for="selectCols">Region</label>
+            <select class="selectCols">
+              <option value="Sheet1">Sheet1</option>
+              <option value="Sheet1">Sheet1</option>
+              <option value="Sheet1">Sheet1</option>
+              <option value="Sheet1">Sheet1</option>
+            </select>
+            <i style="color: #696464; padding-left: 9px">"California" or "CA"</i><br>
+
+            <label for="selectCols">Postal Code</label>
+            <select class="selectCols">
+              <option value="Sheet1">Sheet1</option>
+              <option value="Sheet1">Sheet1</option>
+              <option value="Sheet1">Sheet1</option>
+              <option value="Sheet1">Sheet1</option>
+            </select>
+            <i style="color: #696464; padding-left: 9px"> "94131" </i><br>
+
+            <label for="selectCols">Location Name</label>
+            <select class="selectCols">
+              <option value="Sheet1">Sheet1</option>
+              <option value="Sheet1">Sheet1</option>
+              <option value="Sheet1">Sheet1</option>
+              <option value="Sheet1">Sheet1</option>
+            </select>
+            <i style="color: #696464; padding-left: 9px">“Twin Peaks Petroleum”</i><br>
+
+
+            <label for="selectCols">Latitude</label>
+            <select class="selectCols">
+              <option value="Sheet1">Sheet1</option>
+              <option value="Sheet1">Sheet1</option>
+              <option value="Sheet1">Sheet1</option>
+              <option value="Sheet1">Sheet1</option>
+            </select>
+            <i style="color: #696464; padding-left: 9px"> "37.7371" </i><br>
+
+            <label for="selectCols">Longitude</label>
+            <select class="selectCols">
+              <option value="Sheet1">Sheet1</option>
+              <option value="Sheet1">Sheet1</option>
+              <option value="Sheet1">Sheet1</option>
+              <option value="Sheet1">Sheet1</option>
+            </select>
+            <i style="color: #696464; padding-left: 9px"> "-122.44283" </i><br>
+
+            <label for="selectCols">Country</label>
+            <select class="selectCols">
+              <option value="Sheet1">Sheet1</option>
+              <option value="Sheet1">Sheet1</option>
+              <option value="Sheet1">Sheet1</option>
+              <option value="Sheet1">Sheet1</option>
+            </select>
+            <i style="color: #696464; padding-left: 9px">“US”</i><br>
+        </div>
+
+        <div id="matches" style="margin-top: 30px; margin-bottom: 20px">
+
+            <input id="addressMatch" type="checkbox" name="addressMatch" value="addressMatch" />
+            <label for="addressMatch"> Check for exact address matches only</label><br />
+
+            <input id="nameMatch" type="checkbox" name="nameMatch" value="nameMatch" />
+            <label for="nameMatch"> Check for exact name matches only</label><br />
+
+            <input id="insertError" type="checkbox" name="insertError" value="insertError">
+            <label for="insertError"> Insert errors in new column</label><br />
+
+            <input id="overwritePlacekey" type="checkbox" name="overwritePlacekey" value="overwritePlacekey">
+            <label for="overwritePlacekey"> <span style="font-weight: bolder;"> Overwrite existing Placekey column</span></label><br />
+
+        </div>
+        <a id="generate" onclick="generateKeys()" class="action">
+        Generate Placekeys
+      </a>
+
+        <!--  Point 4  -->
+        <br>
+        <div id="generateToast" style="font-style: italic; color: #484852; margin-top: 12px;"></div>
+
+    </div>
+    <div id="bottomLinks">
+        <!--  Commented to change for point 3
+
+      <a
+        id="changeKey"
+ 
+        onclick="google.script.run.withSuccessHandler(google.script.host.close).changeKey()"
+        >Change API Key</a
+      > -->
+        <a id="docs" href="https://docs.placekey.io/" target="_blank">View API Docs</a>
+        <a id="changeKey" onclick="google.script.run.changeKey()">Change API Key</a>
+    </div>
+    <hr id="bottomHr">
+
+    <!-- spinner -->
+    <div id="stillWorking" class="hidden center">
+        <div id="spinner">
+            <i class="material-icons">autorenew</i>
+        </div>
+        <div id="progressBar">
+            <div id="progressBarLoader"></div>
+        </div>
+    </div>
+    <!-- -->
+
+    <script>
+        document.addEventListener(
+            "DOMContentLoaded",
+            function() {
+                google.script.run.withSuccessHandler(getSheetsToast).getSheets();
+                //   var inputKey = document.getElementById("storedKey").value;
+                //   document.getElementById("key").value = inputKey;
+            },
+            false
+        );
+
+        function getSheetsToast(e) {
+            console.log(e);
+            document.getElementById("stillWorking").style.display = "none";
+            var select = document.getElementById("sheets");
+            var appendSelect = "";
+            for (var i = 0; i < e[1].length; i++) {
+                if (e[1][i] == e[0]) {
+                    appendSelect +=
+                        '<option value="' +
+                        e[1][i] +
+                        '" selected>' +
+                        e[1][i] +
+                        "</option>";
+                } else {
+                    appendSelect +=
+                        '<option value="' + e[1][i] + '">' + e[1][i] + "</option>";
+                }
+            }
+            select.innerHTML = appendSelect;
+            changeSheetToast(e[2]);
+            //  google.script.run.withSuccessHandler(google.script.host.close).setUserProperties(els);
+        }
+
+        function changeSheet() {
+            document.getElementById("overwritePlacekey").disabled = true;
+            document.getElementById("overwritePlacekey").checked = false;
+            var selectedSheet = document.getElementById("sheets").value;
+            console.log(selectedSheet);
+            google.script.run
+                .withSuccessHandler(changeSheetToast)
+                .changeSheet(selectedSheet);
+        }
+
+        function changeSheetToast(e) {
+            console.log(e);
+            if (e == false) {
+                console.log("yes");
+                document.getElementById("emptySheet").style.display = "block";
+                document.getElementById("mapTitle").style.display = "none";
+            } else {
+                document.getElementById("mapTitle").style.display = "block";
+                document.getElementById("emptySheet").style.display = "none";
+                var columnsToAppend = '<option value="--">--</option>';
+                for (var i = 0; i < e[0].length; i++) {
+                    if (e[0][i] != "") {
+                        columnsToAppend +=
+                            ' <option value="' + e[0][i] + '">' + e[0][i] + "</option>";
+                        if (e[0][i] == "Placekey") {
+                            document.getElementById("overwritePlacekey").disabled = false;
+                            document.getElementById("overwritePlacekey").checked = true;
+
+                        }
+                    }
+                }
+                var selectCols = document.getElementsByClassName("selectCols");
+                for (var j = 0; j < selectCols.length; j++) {
+                    selectCols[j].innerHTML = columnsToAppend;
+
+
+                }
+            }
+        }
+
+        function generateKeys() {
+            document.getElementById("generate").disabled = true;
+            var selectCols = document.getElementsByClassName("selectCols");
+            var address = [];
+            for (var j = 0; j < selectCols.length; j++) {
+                address.push(selectCols[j].value);
+            }
+            if (
+                (address[0] == "--" ||
+                    address[1] == "--" ||
+                    address[2] == "--") &&
+                (address[5] == "--" || address[6] == "--")
+            ) {
+                google.script.run.Alert(
+                    "Please select either latitude and longitude or street address, city, state and zip code."
+                );
+                //document.getElementById("didNotSelected").style.display = 'block';
+                document.getElementById("generate").disabled = false;
+                return false;
+            }
+            for (var k = 0; k < address.length; k++) {
+                if (address[k] != "--" && address[k] != true && address[k] != false) {
+                    var count = countInArray(address, address[k]);
+                    console.log(count);
+                    if (count > 1) {
+                        google.script.run.Alert(
+                            "The same column is mapped to more than one field. Please map only one column per field."
+                        );
+                        document.getElementById("generate").disabled = false;
+                        return false;
+                    }
+                }
+            }
+
+            document.getElementById("generateToast").innerHTML = "Working...";
+            setTimeout(function() {
+                document.getElementById("generateToast").innerHTML = "Please wait...";
+            }, 1000);
+            var addressMatch = document.getElementById("addressMatch").checked;
+            var nameMatch = document.getElementById("nameMatch").checked;
+            var overWrite = document.getElementById("overwritePlacekey").checked;
+            var insertError = document.getElementById("insertError").checked;
+            address.push(addressMatch);
+            address.push(nameMatch);
+            address.push(overWrite);
+            address.push(insertError);
+            console.log(address);
+            google.script.run
+                .withFailureHandler(failedAPI)
+                .withSuccessHandler(generateKeysToast)
+                .generateKeys(address);
+        }
+
+        function failedAPI() {
+            document.getElementById("generateToast").innerHTML = "Something went wrong. Please try again!";
+            document.getElementById("generate").disabled = false;
+        }
+
+        function generateKeysToast(e) {
+            document.getElementById("overwritePlacekey").disabled = false;
+            document.getElementById("overwritePlacekey").checked = true;
+            document.getElementById("generateToast").innerHTML = "Done! Generated " + e + " Placekeys.";
+            setTimeout(function() {
+                document.getElementById("generateToast").innerHTML = "";
+            }, 5000);
+            document.getElementById("generate").disabled = false;
+            console.log("sent");
+        }
+
+        function countInArray(array, what) {
+            var count = 0;
+            for (var i = 0; i < array.length; i++) {
+                if (array[i] === what) {
+                    count++;
+                }
+            }
+            return count;
+        }
+
+        function insertSample() {
+            google.script.run.withSuccessHandler(changeSheetToast).insertSample();
+        }
+    </script>
+</body>
+
+</html>

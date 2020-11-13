@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <base target="_top">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://ssl.gstatic.com/docs/script/css/add-ons1.css">
+    <link href="https://fonts.googleapis.com/css2?family=Spartan:wght@500&display=swap" rel="stylesheet">
+
+    <style>
+        body {
+            margin-top: -10px;
+            overflow-x: hidden;
+            overflow-y: hidden;
+            font-family: 'Spartan', sans-serif;
+        }
+        
+        .input-group {
+            padding: 6px 10px;
+            border: 2px solid rgba(128, 128, 128, 0.842);
+            border-radius: 5px;
+            position: relative;
+        }
+        
+        .input-group>label {
+            position: absolute;
+            top: -10px;
+            background-color: white;
+            color: rgba(128, 128, 128, 0.842);
+            font-size: .6rem;
+        }
+        
+        .input-group>input {
+            border: none;
+            width: 100%;
+            font-family: monospace;
+        }
+        
+        input[type="text"]:focus {
+            border: none;
+            box-shadow: none;
+            -webkit-box-shadow: none;
+        }
+        
+        .labelTxt {
+            margin-top: 1.5rem !important;
+            font-size: x-large;
+        }
+        
+        a {
+            color: rgba(0, 0, 0, 0.897);
+            padding: 5px 10px;
+        }
+        
+        a:hover {
+            text-decoration: none;
+            color: black;
+        }
+        
+        #getApi:hover {
+            border-color: transparent;
+        }
+        
+        #finish:hover {
+            background-color: white;
+            color: black;
+            border-color: transparent;
+        }
+        
+        #getApi,
+        #finish {
+            border: 1px solid rgba(0, 0, 0, 0.883);
+            border-radius: 4px;
+            margin-left: 10px;
+        }
+        
+        #finish {
+            background-color: rgba(0, 0, 0, 0.89);
+            color: white;
+        }
+        
+        .footer {
+            margin-right: 0px;
+        }
+        
+        .clear {
+            clear: both;
+        }
+    </style>
+    <script>
+        function insert() {
+            var els = document.getElementById("key").value;
+            console.log(els);
+            google.script.run.withFailureHandler(failHandler).withSuccessHandler(google.script.host.close).setUserProperties(els);
+        }
+    </script>
+</head>
+
+<body>
+    <div id="theBlock" style="display: none;">
+        <div class="labelTxt py-3">Enter your API Key</div>
+        <br>
+
+        <div class="input-group mb-2 mt-3">
+            <label class="px-2 mb-0 ">API Key</label>
+            <input id="key" type="text" class="form-control p-3" spellcheck="false" value='' />
+
+        </div>
+
+        <br>
+
+        <div class="footer row justify-content-end">
+            <a href="https://placekey.io/faq" target="_blank"><span style="padding-top: 1.2px;"> FAQ </span></a>
+            <a id="getApi" href="https://dev.placekey.io/default/register" target="_blank">Get a Free API Key</a>
+            <a id="finish" class="action" onclick="insert()">Finish Setup</a>
+        </div>
+    </div>
+    <br>
+    <br>
+    <div id="error" style="display:none">
+        <span style="color:red; font-size:12px;"> There was an error with authorization. 
+             Please use the addon with your browser default account.<br></span>
+        <br>
+        <center> <a id="finish" class="action" onclick="google.script.host.close()">Close</a> </center>
+    </div>
+    <script>
+        google.script.run.withFailureHandler(failHandler).withSuccessHandler(successHandler).testUser();
+
+        document.addEventListener('DOMContentLoaded', function() {
+            var inputKey = document.getElementById("storedKey").value;
+            document.getElementById("key").value = inputKey;
+        }, false);
+
+        function failHandler() {
+
+            document.getElementById("error").style.display = "block";
+        }
+
+        function successHandler() {
+            document.getElementById("theBlock").style.display = "block";
+        }
+    </script>
+</body>
+
+</html>
