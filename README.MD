@@ -1,21 +1,21 @@
 # Placekey Google Sheet Addon
 
-Placekey is a free, universal standard identifier for any physical place, so that the data pertaining to those places can be shared across organizations easily.
+Placekey is a free, universal standard identifier for any physical place. This Google Sheets Add-on makes it easy to generate Placekeys for your address or POI data. 
 
-This Addon will make it easy to generate Placekey for you listed addresses in sheet.
-Link to addon: https://gsuite.google.com/marketplace/app/placekey/611255445050
-
+# Full Documentation
+https://docs.placekey.io/#cb3ca616-9939-4bef-a978-84f9895e31b3
 
 ## Installation
 
-Open a new sheet in google.
-From top menu click Tools and Script Editor.
-Create the files in script editor as listed in repository.
-From top menu Click Run and onOpen Functon.
+Install the Placekey Google Sheets Add-on from:
+https://gsuite.google.com/marketplace/app/placekey/611255445050
 
 ## Usage
 
-After installation you will be able to generate placekey for your addresses. Just map the address columns in addon and click generate key.
+Import your address or POI information into a new Google Sheet. Or make a blank one to experiment.
+Click Add-ons -> Placekey -> Generate Placekeys.
+Enter your API key. If you don't have one, get a free API key at https://dev.placekey.io/default/register.
+Map your columns to the API fields and click Generate Placekeys.
 
 ## Contributing
 
