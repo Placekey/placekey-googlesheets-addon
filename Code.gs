@@ -110,7 +110,7 @@ function generateKeys(address) {
     var colsHeader = ss.getRange(1, 1, 1, colsNum).getDisplayValues();
     var colsId = [];
     var problematicRows = [];
-    var key = ["street_address", "city", "region", "postal_code", "location_name", "latitude", "longitude"];
+    var key = ["street_address", "city", "region", "postal_code", "location_name", "latitude", "longitude", "iso_country_code"];
 
     // Map user selected address columns with sheet columns
 
@@ -225,10 +225,6 @@ function generateKeys(address) {
             
               data.queries[y]["iso_country_code"] = "US";
               
-            }else{
-            
-              data.queries[y]["iso_country_code"] = rows[k][colsId[7]];
-            
             }
 
             
@@ -269,6 +265,43 @@ function generateKeys(address) {
                 continue
             }
         } catch (e) {}
+        
+        // All batch error replacment
+        
+        if (response.getResponseCode() == 400) {
+             for (var i = 0; i < chunks[v][1] - chunks[v][0]; i++) {
+            if (1==1) {
+                if (address[11] == false) {
+                    eachRowResponse[i] = ['Invalid address'];
+                } else {
+
+                    eachRowResponse.splice(
+                        i,
+                        0, [''],
+                    )
+                    errors[i] = ['Invalid address'];
+                }
+
+            } else {
+                totalPlaceKeys = totalPlaceKeys + 1
+
+                if (address[11] == false) {
+                    eachRowResponse[i] = ['Invalid address']
+
+                } else {
+                    eachRowResponse[i] = ['Invalid address']
+
+                    errors.splice(
+                        i,
+                        0, [''],
+                    )
+                }
+
+            }
+
+        }
+            }
+        //^^^^^^^^^^^^^^^^^^^^^^^^^^^
         for (var i = 0; i < parsed.length; i++) {
             if (parsed[i]["placekey"] == null) {
                 if (address[11] == false) {
@@ -300,6 +333,7 @@ function generateKeys(address) {
             }
 
         }
+        
         Logger.log(problematicRows)
         Logger.log("row response: " + eachRowResponse)
         Logger.log("error: " + errors)
@@ -349,6 +383,7 @@ function generateKeys(address) {
                     ss.getRange(chunks[v][0] + 2, colsNum + 2, chunks[v][2], 1).setValues(errors)
                 }
             } catch (e) {
+           // SpreadsheetApp.getUi().alert(e);
 
                 if (address[11] == false) {
                     ss.getRange(chunks[v][0] + 2, colsNum + 1, chunks[v][2] + 2, 1).setValue(parsed["message"])
