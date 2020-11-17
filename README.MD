@@ -1,4 +1,4 @@
-# Placekey Google Sheet Addon
+# Placekey Google Sheets Add-on
 
 Placekey is a free, universal standard identifier for any physical place. This Google Sheets Add-on makes it easy to generate Placekeys for your address or POI data. 
 
