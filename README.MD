@@ -22,4 +22,4 @@ Map your columns to the API fields and click Generate Placekeys.
 Pull requests are welcome. For major changes, please open an issue first to discuss what you would like to change.
 
 ## License
-[MIT](https://choosealicense.com/licenses/mit/)
+[Apache-2.0 License](https://github.com/Placekey/placekey-googlesheets-addon/blob/master/LICENSE)
