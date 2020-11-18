@@ -196,8 +196,8 @@ function generateKeys(address) {
             // If there are empty cells in a row, that's problematic, Bulk API will not process any query if there is one problematic.
             // therfore, we will check and exclude those rows before requesting for Placekeys.
             Logger.log(rows[k][colsId[0]], rows[k][colsId[1]], rows[k][colsId[2]], rows[k][colsId[3]], rows[k][colsId[5]], rows[k][colsId[6]])
-            if ((rows[k][colsId[0]] == '' || rows[k][colsId[1]] == '' || rows[k][colsId[2]] == '' ||
-                    rows[k][colsId[0]] == null || rows[k][colsId[1]] == null || rows[k][colsId[2]] == null ) &&
+            if ((rows[k][colsId[0]] == ''  || rows[k][colsId[2]] == '' ||
+                    rows[k][colsId[0]] == null || rows[k][colsId[2]] == null ) &&
                 (rows[k][colsId[5]] == '' || rows[k][colsId[6]] == '' || rows[k][colsId[5]] == null || rows[k][colsId[6]] == null)
             ) {
                 problematicRows[k] = countProblem;

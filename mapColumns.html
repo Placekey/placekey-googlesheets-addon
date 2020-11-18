@@ -351,12 +351,12 @@
             }
             if (
                 (address[0] == "--" ||
-                    address[1] == "--" ||
+
                     address[2] == "--") &&
                 (address[5] == "--" || address[6] == "--")
             ) {
                 google.script.run.Alert(
-                    "Please select either latitude and longitude or street address, city, state and zip code."
+                    "Please select either latitude and longitude or street address and state"
                 );
                 //document.getElementById("didNotSelected").style.display = 'block';
                 document.getElementById("generate").disabled = false;
