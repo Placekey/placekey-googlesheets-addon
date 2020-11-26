@@ -14,8 +14,8 @@ function onOpen(e) {
 
 function feedback() {
     var htmlOutput = HtmlService.createTemplateFromFile('Help').evaluate()
-        .setWidth(340)
-        .setHeight(400);
+        .setWidth(350)
+        .setHeight(350);
     SpreadsheetApp.getUi().showModalDialog(htmlOutput, 'Placekey Help');
 }
 
@@ -26,8 +26,8 @@ function PlaceKey() {
     var userKey = userPr.getProperty('Key');
     if (!userKey) {
         var htmlOutput = HtmlService.createTemplateFromFile('setKey').evaluate()
-            .setWidth(650)
-            .setHeight(205);
+            .setWidth(500)
+            .setHeight(150);
         SpreadsheetApp.getUi().showModalDialog(htmlOutput, 'API Key');
     } else {
         var htmlOutput = HtmlService.createTemplateFromFile('mapColumns').evaluate().append('<input id="storedKey" value="" style="display:none">')
@@ -45,8 +45,8 @@ function setUserProperties(els) {
     var userKey = userPr.getProperty('Key');
     if (!userKey) {
         var htmlOutput = HtmlService.createTemplateFromFile('setKey').evaluate()
-            .setWidth(650)
-            .setHeight(205);
+            .setWidth(500)
+            .setHeight(150);
         SpreadsheetApp.getUi().showModalDialog(htmlOutput, 'API Key');
     } else {
         var htmlOutput = HtmlService.createTemplateFromFile('mapColumns').evaluate().append('<input id="storedKey" value="" style="display:none">')
@@ -62,8 +62,8 @@ function changeKey() {
     var userPr = PropertiesService.getUserProperties();
     var userKey = userPr.getProperty('Key');
     var htmlOutput = HtmlService.createTemplateFromFile('setKey').evaluate().append('<input id="storedKey" value="' + userKey + '" style="display:none">')
-        .setWidth(650)
-        .setHeight(205);
+        .setWidth(500)
+        .setHeight(150);
     SpreadsheetApp.getUi().showModalDialog(htmlOutput, 'API Key');
 
 
@@ -470,4 +470,10 @@ function insertSample() {
 
 function Alert(message) {
     SpreadsheetApp.getUi().alert(message);
+}
+
+// Template Functions
+function include(filename) {
+  return HtmlService.createHtmlOutputFromFile(filename)
+    .getContent();
 }
