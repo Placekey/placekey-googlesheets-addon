@@ -1,430 +1,290 @@
 <!DOCTYPE html>
 <html>
-
-<head>
+  <head>
     <base target="_top" />
-    <link rel="stylesheet" href="https://ssl.gstatic.com/docs/script/css/add-ons1.css">
-    <link href="https://fonts.googleapis.com/css2?family=Spartan:wght@350&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
-    <style>
-        body {
-            padding: 20px;
-            overflow-x: hidden;
-            font-family: 'Spartan', sans-serif;
-        }
-        
-        #generate {
-            background-color: black !important;
-            color: white;
-            margin-top: 5px;
-            text-align: center;
-            padding: 8px 48px;
-            border-radius: 3px;
-            margin-bottom: 5px;
-        }
-        
-        #generate:hover,
-        #generate1:hover {
-            text-decoration: none;
-        }
-        
-        #bottomLinks {
-            position: relative;
-            margin-top: 2rem;
-            display: flex;
-            justify-content: space-around;
-        }
-        
-        #bottomLinks a {
-            text-decoration: wavy;
-            color: #139df2;
-            margin-bottom: 8px;
-            font-size: .8rem;
-            font-weight: 900;
-        }
-        
-        #bottomHr {
-            position: relative;
-            width: 83%;
-            padding: .1px;
-            background-color: black;
-            margin-bottom: 45px;
-        }
-        
-        select {
-            width: 95% !important;
-            background: url(https://ssl.gstatic.com/ui/v1/disclosure/grey-disclosure-arrow-up-down.png), -webkit-linear-gradient(top, #fff, #fff);
-            background-repeat: no-repeat;
-            background-position: 95% 50%;
-            font-family: 'Spartan', sans-serif;
-        }
-        
-        select:hover,
-        select:active {
-            background-image: url(https://ssl.gstatic.com/ui/v1/disclosure/grey-disclosure-arrow-up-down.png), -webkit-linear-gradient(top, #fff, #fff);
-        }
-        
-        .selectors i {
-            color: black;
-            font-size: .5rem;
-            font-weight: bold;
-        }
-        
-        .selectors label {
-            color: black;
-            font-size: .7rem;
-            position: relative;
-            top: 10px;
-            left: 8px;
-            padding: 0px 3px;
-            background-color: white;
-        }
-        
-        #matches label {
-            font-size: .65rem;
-        }
-        
-        #spinner {
-            animation: spin 1s infinite linear;
-            height: 24px;
-            width: 24px;
-            margin: auto;
-        }
-        
-        @keyframes spin {
-            from {
-                transform: rotate(0deg);
-            }
-            to {
-                transform: rotate(360deg);
-            }
-        }
-        
-        .clear {
-            clear: both;
-        }
-    </style>
+    <?!= include('Stylesheet'); ?>
+
     <script>
-        function insert() {
-            //  google.script.run.withSuccessHandler(google.script.host.close).setUserProperties(els);
-        }
+      function insert() {
+        // google.script.run.withSuccessHandler(google.script.host.close).setUserProperties(els);
+      }
     </script>
-</head>
+  </head>
 
-<body>
-    <p style="display: none">
-        Placekey gets your address and generates a unique identifier for it. To start select a sheet which contains your addresses.
-    </p>
-    <center>
-        <input id="key" type="text" spellcheck="false" style="
-          display: none;
-          width: 200px;
-          height: 25px;
-          font-size: 12px;
-          font-family: monospace;" value="Sheet1" disabled/>
-    </center>
+  <body>
+    <main class="p-20">
+      <div id="stillWorking" class="text-center">
+        <i class="spinner"></i>
+      </div>
 
+      <div id="emptySheet" style="display: none">
+        <p><strong>This Sheet looks empty.</strong><br />Fill with sample data?</p>
 
-    <div id="emptySheet" style="display: none">
-        <div id="emptySheet" style="margin-top: 10px; padding: 10px;">
-            <span style="font-weight: 600;">This Sheet looks empty.</span><br> Fill with sample data?
-        </div>
-        <br />
-        <a id="generate" onclick="insertSample()" class="action">
-          Fill with sample data
-        </a>
-    </div>
+        <a id="generate" onclick="insertSample()" class="btn-solid w-full mt-20">Fill with sample data</a>
+      </div>
 
-    <div id="mapTitle" style="display: none;">
-        <p style="margin-top: 0px; margin-bottom: 10px; font-weight: bold;">Data Location:</p>
-        <select name="sheets" id="sheets" onChange="changeSheet()">
+      <div id="mapTitle" style="display: none">
+        <h2 class="type-h5">Data Location:</h2>
+
+        <div class="form__group mt-10">
+          <label for="sheets" class="form__label">Sheets</label>
+          <select name="sheets" id="sheets" onChange="changeSheet()" class="form__control">
             <option value="Sheet1">Sheet1</option>
             <option value="Sheet1">Sheet1</option>
-            <option value="Sheet1">Sheet1</option>
-            <option value="Sheet1">Sheet1</option>
-        </select><br><br><br>
-        <div class="selectors">
-            <div><b>Match the headers in your document to the fields below.</b></div>
-            <label for="selectCols">Street Address</label>
-            <select class="selectCols">
-              <option value="Sheet1">Sheet1</option>
-              <option value="Sheet1">Sheet1</option>
-              <option value="Sheet1">Sheet1</option>
-              <option value="Sheet1">Sheet1</option>
-            </select>
-            <i style="color: #696464; padding-left: 9px"> "598 Portola Dr" </i><br>
-
-            <label for="selectCols">City</label>
-            <select class="selectCols">
-              <option value="Sheet1">Sheet1</option>
-              <option value="Sheet1">Sheet1</option>
-              <option value="Sheet1">Sheet1</option>
-              <option value="Sheet1">Sheet1</option>
-            </select>
-            <i style="color: #696464; padding-left: 9px"> "San Fransisco" </i><br>
-
-            <label for="selectCols">Region</label>
-            <select class="selectCols">
-              <option value="Sheet1">Sheet1</option>
-              <option value="Sheet1">Sheet1</option>
-              <option value="Sheet1">Sheet1</option>
-              <option value="Sheet1">Sheet1</option>
-            </select>
-            <i style="color: #696464; padding-left: 9px">"California" or "CA"</i><br>
-
-            <label for="selectCols">Postal Code</label>
-            <select class="selectCols">
-              <option value="Sheet1">Sheet1</option>
-              <option value="Sheet1">Sheet1</option>
-              <option value="Sheet1">Sheet1</option>
-              <option value="Sheet1">Sheet1</option>
-            </select>
-            <i style="color: #696464; padding-left: 9px"> "94131" </i><br>
-
-            <label for="selectCols">Location Name</label>
-            <select class="selectCols">
-              <option value="Sheet1">Sheet1</option>
-              <option value="Sheet1">Sheet1</option>
-              <option value="Sheet1">Sheet1</option>
-              <option value="Sheet1">Sheet1</option>
-            </select>
-            <i style="color: #696464; padding-left: 9px">“Twin Peaks Petroleum”</i><br>
-
-
-            <label for="selectCols">Latitude</label>
-            <select class="selectCols">
-              <option value="Sheet1">Sheet1</option>
-              <option value="Sheet1">Sheet1</option>
-              <option value="Sheet1">Sheet1</option>
-              <option value="Sheet1">Sheet1</option>
-            </select>
-            <i style="color: #696464; padding-left: 9px"> "37.7371" </i><br>
-
-            <label for="selectCols">Longitude</label>
-            <select class="selectCols">
-              <option value="Sheet1">Sheet1</option>
-              <option value="Sheet1">Sheet1</option>
-              <option value="Sheet1">Sheet1</option>
-              <option value="Sheet1">Sheet1</option>
-            </select>
-            <i style="color: #696464; padding-left: 9px"> "-122.44283" </i><br>
-
-            <label for="selectCols">Country</label>
-            <select class="selectCols">
-              <option value="Sheet1">Sheet1</option>
-              <option value="Sheet1">Sheet1</option>
-              <option value="Sheet1">Sheet1</option>
-              <option value="Sheet1">Sheet1</option>
-            </select>
-            <i style="color: #696464; padding-left: 9px">“US”</i><br>
+          </select>
         </div>
 
-        <div id="matches" style="margin-top: 30px; margin-bottom: 20px">
+        <h2 class="type-h5 mt-20">Match the headers in your document to the fields below.</h2>
 
-            <input id="addressMatch" type="checkbox" name="addressMatch" value="addressMatch" />
-            <label for="addressMatch"> Check for exact address matches only</label><br />
-
-            <input id="nameMatch" type="checkbox" name="nameMatch" value="nameMatch" />
-            <label for="nameMatch"> Check for exact name matches only</label><br />
-
-            <input id="insertError" type="checkbox" name="insertError" value="insertError">
-            <label for="insertError"> Insert errors in new column</label><br />
-
-            <input id="overwritePlacekey" type="checkbox" name="overwritePlacekey" value="overwritePlacekey">
-            <label for="overwritePlacekey"> <span style="font-weight: bolder;"> Overwrite existing Placekey column</span></label><br />
-
+        <div class="form__group mt-20">
+          <label for="street" class="form__label"> <strong>Street Address</strong> - e.g. 598 Portola Dr </label>
+          <select id="street" class="selectCols form__control">
+            <option value="Sheet1">Sheet1</option>
+            <option value="Sheet1">Sheet1</option>
+          </select>
         </div>
-        <a id="generate" onclick="generateKeys()" class="action">
-        Generate Placekeys
-      </a>
+
+        <div class="form__group mt-20">
+          <label for="city" class="form__label"> <strong>City</strong> - e.g. San Fransisco </label>
+          <select id="city" class="selectCols form__control">
+            <option value="Sheet1">Sheet1</option>
+            <option value="Sheet1">Sheet1</option>
+          </select>
+        </div>
+
+        <div class="form__group mt-20">
+          <label for="region" class="form__label"> <strong>Region</strong> - e.g. California or CA </label>
+          <select id="region" class="selectCols form__control">
+            <option value="Sheet1">Sheet1</option>
+            <option value="Sheet1">Sheet1</option>
+          </select>
+        </div>
+
+        <div class="form__group mt-20">
+          <label for="postcode" class="form__label"> <strong>Postal Code</strong> - e.g. 94131 </label>
+          <select id="postcode" class="selectCols form__control">
+            <option value="Sheet1">Sheet1</option>
+            <option value="Sheet1">Sheet1</option>
+          </select>
+        </div>
+
+        <div class="form__group mt-20">
+          <label for="location" class="form__label"> <strong>Location Name</strong> - e.g. Twin Peaks Petroleum </label>
+          <select id="location" class="selectCols form__control">
+            <option value="Sheet1">Sheet1</option>
+            <option value="Sheet1">Sheet1</option>
+          </select>
+        </div>
+
+        <div class="form__group mt-20">
+          <label for="latitude" class="form__label"> <strong>Latitude</strong> - e.g. 37.7371 </label>
+          <select id="latitude" class="selectCols form__control">
+            <option value="Sheet1">Sheet1</option>
+            <option value="Sheet1">Sheet1</option>
+          </select>
+        </div>
+
+        <div class="form__group mt-20">
+          <label for="longitude" class="form__label"> <strong>Longitude</strong> - e.g. -122.44283 </label>
+          <select id="longitude" class="selectCols form__control">
+            <option value="Sheet1">Sheet1</option>
+            <option value="Sheet1">Sheet1</option>
+          </select>
+        </div>
+
+        <div class="form__group mt-20">
+          <label for="country" class="form__label"> <strong>Country</strong> - e.g. US </label>
+          <select id="country" class="selectCols form__control">
+            <option value="Sheet1">Sheet1</option>
+            <option value="Sheet1">Sheet1</option>
+          </select>
+        </div>
+
+        <div class="form__group text-12 mt-25">
+          <div class="flex items-center">
+            <input id="addressMatch" type="checkbox" name="addressMatch" value="addressMatch" class="form__control" />
+            <label for="addressMatch" class="ml-10"> Check for exact address matches only</label>
+          </div>
+
+          <div class="flex items-center mt-5">
+            <input id="nameMatch" type="checkbox" name="nameMatch" value="nameMatch" class="form__control" />
+            <label for="nameMatch" class="ml-10"> Check for exact name matches only</label>
+          </div>
+
+          <div class="flex items-center mt-5">
+            <input id="insertError" type="checkbox" name="insertError" value="insertError" class="form__control" />
+            <label for="insertError" class="ml-10"> Insert errors in new column</label>
+          </div>
+
+          <div class="flex items-center mt-5">
+            <input id="overwritePlacekey" type="checkbox" name="overwritePlacekey" value="overwritePlacekey" class="form__control" disabled />
+            <label for="overwritePlacekey" class="ml-10">Overwrite existing Placekey column</label>
+          </div>
+        </div>
+
+        <button id="generate" onclick="generateKeys()" class="btn-solid w-full mt-20">Generate Placekeys</button>
 
         <!--  Point 4  -->
-        <br>
-        <div id="generateToast" style="font-style: italic; color: #484852; margin-top: 12px;"></div>
+        <div id="generateToast" style="font-style: italic; color: #484852; margin-top: 12px"></div>
+      </div>
 
-    </div>
-    <div id="bottomLinks">
-        <!--  Commented to change for point 3
-
-      <a
-        id="changeKey"
- 
-        onclick="google.script.run.withSuccessHandler(google.script.host.close).changeKey()"
-        >Change API Key</a
-      > -->
-        <a id="docs" href="https://docs.placekey.io/" target="_blank">View API Docs</a>
-        <a id="changeKey" onclick="google.script.run.changeKey()">Change API Key</a>
-    </div>
-    <hr id="bottomHr">
-
-    <!-- spinner -->
-    <div id="stillWorking" class="hidden center">
-        <div id="spinner">
-            <i class="material-icons">autorenew</i>
+      <footer class="mt-20">
+        <div class="flex justify-between">
+          <a id="docs" href="https://docs.placekey.io/" target="_blank" class="cursor-pointer text-blue-dodger">View API Docs</a>
+          <a id="changeKey" onclick="google.script.run.changeKey()" class="cursor-pointer text-blue-dodger">Change API Key</a>
         </div>
-        <div id="progressBar">
-            <div id="progressBarLoader"></div>
-        </div>
-    </div>
-    <!-- -->
+
+        <hr class="hr mt-15" />
+
+        <a href="https://www.placekey.io/" target="_blank" rel="noopener">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 81 23" width="80" height="25" class="ml-auto mt-20">
+            <path d="M78.5 23h-76C1.1 23 0 21.9 0 20.5v-18C0 1.1 1.1 0 2.5 0h76C79.9 0 81 1.1 81 2.5v18c0 1.4-1.1 2.5-2.5 2.5z" />
+            <path
+              d="M70.3 8.5l2.2 4.3 1.9-4.3H77l-5.6 11h-2.5l2.4-4.6-3.5-6.4h2.5zm-61.6-5c2.6 0 4.7 2.1 4.7 4.7s-4.3 8.5-4.7 8.5S4 10.8 4 8.2s2.1-4.7 4.7-4.7zm24.4 4.8c.5 0 1 .1 1.5.3.4.2.8.5 1.1.8v-.9h2.2v7.3h-2.2v-1c-.3.4-.7.7-1.1.9-.4.2-.9.3-1.4.3-.7 0-1.3-.2-1.8-.5s-1-.8-1.3-1.4c-.3-.6-.5-1.3-.5-2s.2-1.4.5-2c.3-.6.7-1 1.3-1.4.4-.2 1-.4 1.7-.4zm9.5 0c.5 0 .9.1 1.4.2s.8.3 1 .5l-.7 1.5c-.4-.3-.8-.4-1.3-.4s-.8.1-1.1.3c-.3.2-.6.5-.7.8-.2.3-.2.7-.2 1 0 .4.1.7.3 1.1.2.3.4.6.7.8.3.2.7.3 1.1.3.3 0 .5 0 .7-.1l.6-.3.7 1.5c-.3.2-.6.4-1 .5h-1.5c-.6 0-1.1-.1-1.6-.3s-.9-.5-1.3-.8c-.4-.4-.7-.8-.9-1.2-.2-.5-.3-1-.3-1.5s.1-1 .3-1.5c.2-.5.5-.9.9-1.2s.8-.6 1.3-.9 1.1-.3 1.6-.3zm6.4 0c.8 0 1.4.2 2 .5s1 .8 1.3 1.3c.3.6.5 1.2.5 2v.5h-5.6c0 .4.1.7.3 1 .2.3.4.5.7.6.3.2.7.2 1.1.2.4 0 .7-.1 1-.2.3-.1.6-.4.8-.7l1.6.8c-.3.6-.8 1.1-1.5 1.4-.6.3-1.3.5-2.1.5s-1.5-.2-2.1-.5c-.6-.3-1.1-.8-1.5-1.4-.4-.6-.5-1.2-.5-2 0-.5.1-1 .3-1.5.2-.5.5-.9.9-1.2.4-.4.8-.6 1.3-.8.4-.4.9-.5 1.5-.5zm15.7 0c.8 0 1.4.2 2 .5s1 .8 1.3 1.3c.3.6.5 1.2.5 2v.5h-5.6c0 .4.1.7.3 1 .2.3.4.5.7.6.3.2.7.2 1.1.2.4 0 .7-.1 1-.2.3-.1.6-.4.8-.7l1.6.8c-.3.6-.8 1.1-1.5 1.4-.6.3-1.3.5-2.1.5s-1.5-.2-2.1-.5c-.6-.3-1.1-.8-1.5-1.4-.4-.6-.5-1.2-.5-2 0-.5.1-1 .3-1.5.2-.5.5-.9.9-1.2.4-.4.8-.6 1.3-.8.4-.4.9-.5 1.5-.5zM21.9 4.1c.8 0 1.4.1 2 .4.6.3 1.1.7 1.4 1.2s.5 1.2.5 2-.2 1.4-.5 2c-.3.6-.8 1-1.4 1.3-.6.3-1.3.4-2 .4h-1.7v4.5h-2.3V4.1h4zm6.8-.1v11.9h-2.2V4h2.2zm27.1 0v7.2l2.7-2.7h2.8l-3.6 3.6 3.7 3.7h-2.8l-2.9-2.9v2.9h-2.2V4h2.3zm-22 6.2c-.4 0-.7.1-1 .3-.3.2-.5.4-.7.7s-.3.7-.3 1 .1.7.3 1c.2.3.4.5.7.7.3.2.6.3 1 .3s.7-.1 1-.3c.3-.2.5-.4.7-.7.2-.3.2-.7.2-1 0-.4-.1-.7-.3-1s-.4-.5-.7-.7c-.2-.3-.6-.3-.9-.3zM8.7 6.3c-1 0-1.9.9-1.9 1.9 0 .7.4 1.3 1 1.7h.1L7.8 11v.1c0 .5.4.9.9.9h.1c.5 0 .8-.4.8-.9V10c.6-.3 1.1-1 1.1-1.7-.1-1.1-.9-2-2-2zM49 9.9c-.3 0-.6.1-.8.2-.2.1-.4.3-.6.5s-.2.4-.3.7h3.4c0-.3-.1-.5-.3-.7-.2-.2-.4-.4-.6-.5-.2-.2-.5-.2-.8-.2zm15.7 0c-.3 0-.6.1-.8.2-.2.1-.4.3-.6.5s-.3.4-.3.6h3.4c0-.3-.1-.5-.3-.7-.2-.2-.4-.4-.6-.5s-.5-.1-.8-.1zm-43.5-4h-1v3.6h1c.4 0 .8-.1 1.1-.2.3-.1.6-.3.8-.6s.3-.6.3-1-.1-.8-.3-1c-.2-.3-.5-.4-.8-.6-.3-.1-.7-.2-1.1-.2z"
+              fill="#fff"
+            />
+          </svg>
+        </a>
+      </footer>
+    </main>
 
     <script>
-        document.addEventListener(
-            "DOMContentLoaded",
-            function() {
-                google.script.run.withSuccessHandler(getSheetsToast).getSheets();
-                //   var inputKey = document.getElementById("storedKey").value;
-                //   document.getElementById("key").value = inputKey;
-            },
-            false
-        );
+      document.addEventListener(
+        "DOMContentLoaded",
+        function () {
+          google.script.run.withSuccessHandler(getSheetsToast).getSheets();
+          // var inputKey = document.getElementById("storedKey").value;
+          // document.getElementById("key").value = inputKey;
+        },
+        false
+      );
 
-        function getSheetsToast(e) {
-            console.log(e);
-            document.getElementById("stillWorking").style.display = "none";
-            var select = document.getElementById("sheets");
-            var appendSelect = "";
-            for (var i = 0; i < e[1].length; i++) {
-                if (e[1][i] == e[0]) {
-                    appendSelect +=
-                        '<option value="' +
-                        e[1][i] +
-                        '" selected>' +
-                        e[1][i] +
-                        "</option>";
-                } else {
-                    appendSelect +=
-                        '<option value="' + e[1][i] + '">' + e[1][i] + "</option>";
-                }
+      function getSheetsToast(e) {
+        console.log(e);
+        document.getElementById("stillWorking").style.display = "none";
+        var select = document.getElementById("sheets");
+        var appendSelect = "";
+        for (var i = 0; i < e[1].length; i++) {
+          if (e[1][i] == e[0]) {
+            appendSelect += '<option value="' + e[1][i] + '" selected>' + e[1][i] + "</option>";
+          } else {
+            appendSelect += '<option value="' + e[1][i] + '">' + e[1][i] + "</option>";
+          }
+        }
+        select.innerHTML = appendSelect;
+        changeSheetToast(e[2]);
+        // google.script.run.withSuccessHandler(google.script.host.close).setUserProperties(els);
+      }
+
+      function changeSheet() {
+        // document.getElementById("overwritePlacekey").disabled = true;
+        document.getElementById("overwritePlacekey").checked = false;
+        var selectedSheet = document.getElementById("sheets").value;
+        console.log(selectedSheet);
+        google.script.run
+          .withSuccessHandler(changeSheetToast)
+          .changeSheet(selectedSheet);
+      }
+
+      function changeSheetToast(e) {
+        console.log(e);
+        if (e == false) {
+          console.log("yes");
+          document.getElementById("emptySheet").style.display = "block";
+          document.getElementById("mapTitle").style.display = "none";
+        } else {
+          document.getElementById("mapTitle").style.display = "block";
+          document.getElementById("emptySheet").style.display = "none";
+          var columnsToAppend = '<option value="--">--</option>';
+          for (var i = 0; i < e[0].length; i++) {
+            if (e[0][i] != "") {
+              columnsToAppend += ' <option value="' + e[0][i] + '">' + e[0][i] + "</option>";
+              if (e[0][i] == "Placekey") {
+                document.getElementById("overwritePlacekey").disabled = false;
+                document.getElementById("overwritePlacekey").checked = true;
+              }
             }
-            select.innerHTML = appendSelect;
-            changeSheetToast(e[2]);
-            //  google.script.run.withSuccessHandler(google.script.host.close).setUserProperties(els);
+          }
+          var selectCols = document.getElementsByClassName("selectCols");
+          for (var j = 0; j < selectCols.length; j++) {
+            selectCols[j].innerHTML = columnsToAppend;
+          }
         }
+      }
 
-        function changeSheet() {
-            // document.getElementById("overwritePlacekey").disabled = true;
-            document.getElementById("overwritePlacekey").checked = false;
-            var selectedSheet = document.getElementById("sheets").value;
-            console.log(selectedSheet);
-            google.script.run
-                .withSuccessHandler(changeSheetToast)
-                .changeSheet(selectedSheet);
+      function generateKeys() {
+        document.getElementById("generate").disabled = true;
+        var selectCols = document.getElementsByClassName("selectCols");
+        var address = [];
+        for (var j = 0; j < selectCols.length; j++) {
+          address.push(selectCols[j].value);
         }
-
-        function changeSheetToast(e) {
-            console.log(e);
-            if (e == false) {
-                console.log("yes");
-                document.getElementById("emptySheet").style.display = "block";
-                document.getElementById("mapTitle").style.display = "none";
-            } else {
-                document.getElementById("mapTitle").style.display = "block";
-                document.getElementById("emptySheet").style.display = "none";
-                var columnsToAppend = '<option value="--">--</option>';
-                for (var i = 0; i < e[0].length; i++) {
-                    if (e[0][i] != "") {
-                        columnsToAppend +=
-                            ' <option value="' + e[0][i] + '">' + e[0][i] + "</option>";
-                        if (e[0][i] == "Placekey") {
-                            document.getElementById("overwritePlacekey").disabled = false;
-                            document.getElementById("overwritePlacekey").checked = true;
-
-                        }
-                    }
-                }
-                var selectCols = document.getElementsByClassName("selectCols");
-                for (var j = 0; j < selectCols.length; j++) {
-                    selectCols[j].innerHTML = columnsToAppend;
-
-
-                }
+        if ((address[0] == "--" || address[2] == "--") && (address[5] == "--" || address[6] == "--")) {
+          google.script.run.Alert("Please select either latitude and longitude or street address and state");
+          // document.getElementById("didNotSelected").style.display = 'block';
+          document.getElementById("generate").disabled = false;
+          return false;
+        }
+        for (var k = 0; k < address.length; k++) {
+          if (address[k] != "--" && address[k] != true && address[k] != false) {
+            var count = countInArray(address, address[k]);
+            console.log(count);
+            if (count > 1) {
+              google.script.run.Alert("The same column is mapped to more than one field. Please map only one column per field.");
+              document.getElementById("generate").disabled = false;
+              return false;
             }
+          }
         }
 
-        function generateKeys() {
-            document.getElementById("generate").disabled = true;
-            var selectCols = document.getElementsByClassName("selectCols");
-            var address = [];
-            for (var j = 0; j < selectCols.length; j++) {
-                address.push(selectCols[j].value);
-            }
-            if (
-                (address[0] == "--" ||
+        document.getElementById("generateToast").innerHTML = "Working...";
+        setTimeout(function () {
+          document.getElementById("generateToast").innerHTML = "Please wait...";
+        }, 1000);
+        var addressMatch = document.getElementById("addressMatch").checked;
+        var nameMatch = document.getElementById("nameMatch").checked;
+        var overWrite = document.getElementById("overwritePlacekey").checked;
+        var insertError = document.getElementById("insertError").checked;
+        address.push(addressMatch);
+        address.push(nameMatch);
+        address.push(overWrite);
+        address.push(insertError);
+        console.log(address);
+        google.script.run
+          .withFailureHandler(failedAPI)
+          .withSuccessHandler(generateKeysToast)
+          .generateKeys(address);
+      }
 
-                    address[2] == "--") &&
-                (address[5] == "--" || address[6] == "--")
-            ) {
-                google.script.run.Alert(
-                    "Please select either latitude and longitude or street address and state"
-                );
-                //document.getElementById("didNotSelected").style.display = 'block';
-                document.getElementById("generate").disabled = false;
-                return false;
-            }
-            for (var k = 0; k < address.length; k++) {
-                if (address[k] != "--" && address[k] != true && address[k] != false) {
-                    var count = countInArray(address, address[k]);
-                    console.log(count);
-                    if (count > 1) {
-                        google.script.run.Alert(
-                            "The same column is mapped to more than one field. Please map only one column per field."
-                        );
-                        document.getElementById("generate").disabled = false;
-                        return false;
-                    }
-                }
-            }
+      function failedAPI() {
+        document.getElementById("generateToast").innerHTML = "Something went wrong. Please try again!";
+        document.getElementById("generate").disabled = false;
+      }
 
-            document.getElementById("generateToast").innerHTML = "Working...";
-            setTimeout(function() {
-                document.getElementById("generateToast").innerHTML = "Please wait...";
-            }, 1000);
-            var addressMatch = document.getElementById("addressMatch").checked;
-            var nameMatch = document.getElementById("nameMatch").checked;
-            var overWrite = document.getElementById("overwritePlacekey").checked;
-            var insertError = document.getElementById("insertError").checked;
-            address.push(addressMatch);
-            address.push(nameMatch);
-            address.push(overWrite);
-            address.push(insertError);
-            console.log(address);
-            google.script.run
-                .withFailureHandler(failedAPI)
-                .withSuccessHandler(generateKeysToast)
-                .generateKeys(address);
+      function generateKeysToast(e) {
+        document.getElementById("overwritePlacekey").disabled = false;
+        document.getElementById("overwritePlacekey").checked = true;
+        document.getElementById("generateToast").innerHTML = "Done! Generated " + e + " Placekeys.";
+        setTimeout(function () {
+          document.getElementById("generateToast").innerHTML = "";
+        }, 5000);
+        document.getElementById("generate").disabled = false;
+        console.log("sent");
+      }
+
+      function countInArray(array, what) {
+        var count = 0;
+        for (var i = 0; i < array.length; i++) {
+          if (array[i] === what) {
+            count++;
+          }
         }
+        return count;
+      }
 
-        function failedAPI() {
-            document.getElementById("generateToast").innerHTML = "Something went wrong. Please try again!";
-            document.getElementById("generate").disabled = false;
-        }
-
-        function generateKeysToast(e) {
-            document.getElementById("overwritePlacekey").disabled = false;
-            document.getElementById("overwritePlacekey").checked = true;
-            document.getElementById("generateToast").innerHTML = "Done! Generated " + e + " Placekeys.";
-            setTimeout(function() {
-                document.getElementById("generateToast").innerHTML = "";
-            }, 5000);
-            document.getElementById("generate").disabled = false;
-            console.log("sent");
-        }
-
-        function countInArray(array, what) {
-            var count = 0;
-            for (var i = 0; i < array.length; i++) {
-                if (array[i] === what) {
-                    count++;
-                }
-            }
-            return count;
-        }
-
-        function insertSample() {
-            google.script.run.withSuccessHandler(changeSheetToast).insertSample();
-        }
+      function insertSample() {
+        google.script.run.withSuccessHandler(changeSheetToast).insertSample();
+      }
     </script>
-</body>
-
+  </body>
 </html>
