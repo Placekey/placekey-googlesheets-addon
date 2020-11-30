@@ -23,3 +23,11 @@ Pull requests are welcome. For major changes, please open an issue first to disc
 
 ## License
 [Apache-2.0 License](https://github.com/Placekey/placekey-googlesheets-addon/blob/master/LICENSE)
+
+## Deployment
+Only copy these files into the Google Addon:
+* Code.gs
+* Help.html
+* mapColumns.html
+* setKey.html
+* Stlyesheet.html
