@@ -233,7 +233,7 @@
             for (var j = 0; j < selectCols.length; j++) {
                 address.push(selectCols[j].value);
             }
-            if ((address[1] == "--" || address[3] == "--") && (address[5] == "--" || address[6] == "--") && (address[1] == "--" || address[2] == "--") || address[4] == "--") {
+            if ((address[1] == "--" || address[3] == "--") && (address[5] == "--" || address[6] == "--") && (address[1] == "--" || address[2] == "--" || address[4] == "--")) {
                 google.script.run.Alert("Please select either latitude and longitude or street address and state");
                 // document.getElementById("didNotSelected").style.display = 'block';
                 document.getElementById("generate").disabled = false;
