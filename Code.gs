@@ -210,6 +210,11 @@ function generateKeys(address) {
       // continue bulding queries, some values need to be placed as integer
 
       for (var n = 0; n < colsId.length; n++) {
+        
+        // Add null value for location name and state if it's unselected.
+        if((colsId[n] == '--' && n == 0) || colsId[n] == '--' && n == 3){
+          data.queries[y][key[n]] = "";
+        }
         if (rows[k][colsId[n]] != '' && colsId[n] != '--') {
 
           data.queries[y][key[n]] = {};
