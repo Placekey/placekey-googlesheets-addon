@@ -50,16 +50,16 @@
         <h2 class="type-h5 mt-20">Match the headers in your document to the fields below.</h2>
 
         <div class="form__group mt-20">
-          <label for="location" class="form__label"> <strong>Location Name</strong> - e.g. Twin Peaks Petroleum </label>
-          <select id="location" class="selectCols form__control">
+          <label for="location_name" class="form__label"> <strong>Location Name</strong> - e.g. Twin Peaks Petroleum </label>
+          <select id="location_name" class="selectCols form__control">
             <option value="Sheet1">Sheet1</option>
             <option value="Sheet1">Sheet1</option>
           </select>
         </div>
 
         <div class="form__group mt-20">
-          <label for="street" class="form__label"> <strong>Street Address</strong> - e.g. 598 Portola Dr </label>
-          <select id="street" class="selectCols form__control">
+          <label for="street_address" class="form__label"> <strong>Street Address</strong> - e.g. 598 Portola Dr </label>
+          <select id="street_address" class="selectCols form__control">
             <option value="Sheet1">Sheet1</option>
             <option value="Sheet1">Sheet1</option>
           </select>
@@ -82,8 +82,8 @@
         </div>
 
         <div class="form__group mt-20">
-          <label for="postcode" class="form__label"> <strong>Postal Code</strong> - e.g. 94131 </label>
-          <select id="postcode" class="selectCols form__control">
+          <label for="postal_code" class="form__label"> <strong>Postal Code</strong> - e.g. 94131 </label>
+          <select id="postal_code" class="selectCols form__control">
             <option value="Sheet1">Sheet1</option>
             <option value="Sheet1">Sheet1</option>
           </select>
@@ -106,8 +106,8 @@
         </div>
 
         <div class="form__group mt-20">
-          <label for="country" class="form__label"> <strong>Country</strong> - e.g. US </label>
-          <select id="country" class="selectCols form__control">
+          <label for="iso_country_code" class="form__label"> <strong>Country</strong> - e.g. US </label>
+          <select id="iso_country_code" class="selectCols form__control">
             <option value="Sheet1">Sheet1</option>
             <option value="Sheet1">Sheet1</option>
           </select>
@@ -118,17 +118,25 @@
           Which optional fields would you like to return?
           <div class="flex items-center">
           <input id="address_placekey" type="checkbox" name="address_placekey" value="address_placekey" class="form__control returnFields" />
-          <label for="address_placekey" class="ml-10">Address Placekey</label>
+          <label for="address_placekey" class="ml-10">Address Placekey   </label>
 
           <input id="building_placekey" type="checkbox" name="building_placekey" value="building_placekey" class="form__control returnFields" />
           <label for="building_placekey" class="ml-10">Building Placekey</label>
-
+      
+          
+        </div>
+        <br>
+        <div class="flex items-center">
           <input id="confidence_score" type="checkbox" name="confidence_score" value="confidence_score" class="form__control returnFields" />
           <label for="confidence_score" class="ml-10">Confidence Level</label>
 
           <input id="gers" type="checkbox" name="gers" value="gers" class="form__control returnFields" />
           <label for="gers" class="ml-10">GERS</label>
-        </div>
+
+
+          <input id="geocode" type="checkbox" name="geocode" value="geocode" class="form__control returnFields" />
+          <label for="geocode" class="ml-10">Geocode</label>
+          </div>
         
 
           <!-- <div class="flex items-center mt-5">
@@ -242,6 +250,8 @@
         }
       }
 
+      
+
       let status;
 
       function generateKeys() {
@@ -258,27 +268,46 @@
         console.log('FIELDS ', requestFields)
 
         var address = [];
+        const columnMappings = {}
         for (var j = 0; j < selectCols.length; j++) {
-          address.push(selectCols[j].value);
+          // console.log('COLUMN MAP ', selectCols[j].id , ' : ', selectCols[j].value)
+          columnMappings[selectCols[j].id] = selectCols[j].value
         }
-        console.log('ADDRESS: ', address)
+
+        //verify user has provided minimum input data
         if ((address[1] == "--" || address[3] == "--") && (address[5] == "--" || address[6] == "--") && (address[1] == "--" || address[2] == "--" || address[4] == "--")) {
           google.script.run.Alert("Please select either latitude and longitude or street address and state");
           // document.getElementById("didNotSelected").style.display = 'block';
           document.getElementById("generate").disabled = false;
           return false;
         }
-        for (var k = 0; k < address.length; k++) {
-          if (address[k] != "--" && address[k] != true && address[k] != false) {
-            var count = countInArray(address, address[k]);
-            console.log(count);
-            if (count > 1) {
-              google.script.run.Alert("The same column is mapped to more than one field. Please map only one column per field.");
+
+        //verify each column is only mapped to one field
+        for(let col of Object.values(columnMappings)){
+          if(col==="--"){
+            continue
+          }
+          const valueList = Object.values(columnMappings)
+          let index = valueList.indexOf(col)
+          if(valueList.indexOf(col, index+1)!=-1){
+            google.script.run.Alert("The same column is mapped to more than one field. Please map only one column per field.");
               document.getElementById("generate").disabled = false;
               return false;
-            }
           }
         }
+
+
+        // for (var k = 0; k < address.length; k++) {
+        //   if (address[k] != "--" && address[k] != true && address[k] != false) {
+        //     var count = countInArray(address, address[k]);
+        //     console.log(count);
+        //     if (count > 1) {
+        //       google.script.run.Alert("The same column is mapped to more than one field. Please map only one column per field.");
+        //       document.getElementById("generate").disabled = false;
+        //       return false;
+        //     }
+        //   }
+        // }
 
         document.getElementById("generateToast").innerHTML = "Working...";
         setTimeout(function () {
@@ -290,23 +319,35 @@
         // var addressMatch = document.getElementById("addressMatch").checked;
         // var nameMatch = document.getElementById("nameMatch").checked;
         // var overWrite = document.getElementById("overwritePlacekey").checked;
-        var insertError = document.getElementById("insertError").checked;
-        console.log('INSERT ERROR ', insertError)
+        let configOptions = {
+          addressMatch: false,
+          nameMatch: false,
+          overwrite: true,
+          insertError: document.getElementById("insertError").checked,
+        }
+        // var insertError = document.getElementById("insertError").checked;
+        console.log('CONFIG OPTIONS ', configOptions)
         /**
          * disabled checkbox code
          **/
         // address.push(addressMatch);
         // address.push(nameMatch);
         // address.push(overWrite);
-        address.push(false); //8, addressMatch
-        address.push(false); //9, nameMatch
-        address.push(true); //10, overwrite
-        address.push(insertError); // 11, insertError
-        console.log('address ', address);
+        // address.push(false); //8, addressMatch
+        // address.push(false); //9, nameMatch
+        // address.push(true); //10, overwrite
+        // address.push(insertError); // 11, insertError
+
+        const config = {
+          columnMappings: columnMappings,
+          requestFields: requestFields,
+          options: configOptions
+        }
+        console.log('config  ', config);
 
         window.key = crypto.randomUUID() + "." + new Date().getTime();
 
-        google.script.run.withFailureHandler(failedAPI).withSuccessHandler(generateKeysToast).generateKeys(address, key, requestFields);
+        google.script.run.withFailureHandler(failedAPI).withSuccessHandler(generateKeysToast).generateKeys(config, key);
 
         if (status) {
           clearInterval(status);
@@ -364,15 +405,15 @@
         }
       }
 
-      function countInArray(array, what) {
-        var count = 0;
-        for (var i = 0; i < array.length; i++) {
-          if (array[i] === what) {
-            count++;
-          }
-        }
-        return count;
-      }
+      // function countInArray(array, what) {
+      //   var count = 0;
+      //   for (var i = 0; i < array.length; i++) {
+      //     if (array[i] === what) {
+      //       count++;
+      //     }
+      //   }
+      //   return count;
+      // }
 
       function insertSample() {
         google.script.run.withSuccessHandler(changeSheetToast).insertSample();
