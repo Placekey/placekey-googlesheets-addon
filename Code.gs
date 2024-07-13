@@ -202,6 +202,13 @@ function onInstall(e) {
           "latitude": columnMappings["latitude"] === NO_INPUT_STRING ? "": row[columnMappings["latitude"].rowIndex],
           "longitude": columnMappings["longitude"] === NO_INPUT_STRING ? "": row[columnMappings["longitude"].rowIndex],
           "iso_country_code": columnMappings["iso_country_code"]===NO_INPUT_STRING ? "US" : row[columnMappings["iso_country_code"].rowIndex],
+          "place_metadata": {
+              "store_id": columnMappings["store_id"] === NO_INPUT_STRING ? "": row[columnMappings["store_id"].rowIndex],
+              "phone_number": columnMappings["phone_number"] === NO_INPUT_STRING ? "": row[columnMappings["phone_number"].rowIndex],
+              "website": columnMappings["website"] === NO_INPUT_STRING ? "": row[columnMappings["website"].rowIndex],
+              "naics_code": columnMappings["naics_code"] === NO_INPUT_STRING ? "": row[columnMappings["naics_code"].rowIndex],
+              "mcc_code": columnMappings["mcc_code"] === NO_INPUT_STRING ? "": row[columnMappings["mcc_code"].rowIndex]
+            }
         }
     }
 
