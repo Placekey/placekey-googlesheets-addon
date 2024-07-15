@@ -105,21 +105,25 @@ function changeSheet(selectedSheet) {
   }
 }
 
+const getStatusKey = (key) => key+"status"
 // get processing status
 function getStatus(key) {
+  console.log('KEY RECEIVED FROM GET STATUS CALL ', key)
   console.log("Hello from getStatus")
-  // let props = PropertiesService.getDocumentProperties();
-  // let value = props.getProperty(key);
-  // let total = props.getProperty(key + "total");
-
-  return { key, ...getRunningStatus_(key) };
+  let props = PropertiesService.getDocumentProperties();
+  console.log('PROPS ', props.getProperties())
+  let status = props.getProperty(getStatusKey(key));
+  console.log('GOT STATUS ', status)
+  return status;
 }
 
 // It's generating Placekeys by requesting bulk
 
 function generateKeys(config, uniqueKey) {
   console.log('CONFIG ', config)
+
   let {columnMappings, options, requestFields} = config
+  let props = PropertiesService.getDocumentProperties();
 
   console.log('COL MAPS ', columnMappings)
   console.log('OPTIONS ', options)
@@ -175,6 +179,7 @@ function generateKeys(config, uniqueKey) {
 
   var rowNum = ss.getLastRow();
   console.log(`There are ${rowNum-1} rows in the document`)
+  
 
   //If there's already a column in the document for all the fields, get it and save it, otherwise, append it to the end
   let appendedFields = 0
@@ -254,12 +259,18 @@ function generateKeys(config, uniqueKey) {
     } 
   //determines if a row has enough inputs to be valid
   const isValidRow = (row) => {
-    //return true
+      // return {
+      //     isValid: true,
+      //     message: "The row is valid"
+      //   }
     const rowObj = mapRowToObject(row)
     console.log('ROW OBJ ', rowObj)
     const keysWithValues = Object.keys(rowObj).filter( key => rowObj[key].length > 0)
     // console.log('keysWithValues ', keysWithValues)
-    if(keysWithValues.length===0){
+    /*
+    if no keys are provided or only the country is provided, the row is considered empty (we add default value of 'US' to row if no country provided)
+    */
+    if(keysWithValues.length===0 || (keysWithValues.length===1 && keysWithValues[0]==="iso_country_code")){
       return {
         isValid: false,
         message: EMPTY_ROW_ERROR_MESSAGE
@@ -301,7 +312,9 @@ function generateKeys(config, uniqueKey) {
   //determine which rows are valid before sending to API so as to not use up daily limit with badly formatted rows
   let validRows = {}
   let errorRows = {}
+  props.setProperty(getStatusKey(uniqueKey), `Loading ${rowNum-1} rows from the document...`);
   for(let i = 0; i < allRowsValues.length; i++){
+    
     // console.log('ROW VALUES[i] ', allRowsValues[i])
     const {isValid, message} = isValidRow(allRowsValues[i])
      if(!isValid){
@@ -314,6 +327,8 @@ function generateKeys(config, uniqueKey) {
       }
     validRows[i] = allRowsValues[i]
   }
+
+  props.setProperty(getStatusKey(uniqueKey), `Finshed loading ${rowNum-1} rows. ${Object.keys(validRows).length}/${rowNum-1} rows are valid.`);
 
 
   //get the valid row indexes so that we can reinsert them in correct position after fetching api data
@@ -363,6 +378,7 @@ function generateKeys(config, uniqueKey) {
 
   for(let i = 0; i < batches.length; i++){
     let batch = batches[i]
+    props.setProperty(getStatusKey(uniqueKey), `Fetching Placekeys for ${batch.length+(i*STEP)}/${sortedValidRows.length} valid rows...`);
     // console.log('batch ', batch)
      let body = {
         queries: batch,
@@ -392,13 +408,15 @@ function generateKeys(config, uniqueKey) {
   if(res.getResponseCode() != 200){
     console.log('RES WITH ERROR STATUS CODE ', res.getResponseCode())
     console.log(res.getContentText())
+    let message = "Something went wrong. Please try again."
     if(res.getResponseCode()===429){
-      return "Number of requests exceeded the free tier limit of 10,000 requests/day."
+      message = "Number of requests exceeded the free tier limit of 10,000 requests/day."
     }
     if(res.getResponseCode()==400){
-      return "Malformed input"
+      message = `The API returned an error because at least one row between ${sortedValidRows[i*STEP]+2} and ${sortedValidRows[(i*STEP)+STEP-1]+2} is malformed.`
     }
-    throw new Error('test')
+    props.setProperty(getStatusKey(uniqueKey), message);
+    throw new Error(message)
   }
 
   let json = JSON.parse(res.getContentText());
@@ -450,6 +468,7 @@ function generateKeys(config, uniqueKey) {
 
   if(totalPlaceKeys%1000===0){
     console.log('Waiting a minute to avoid hitting api limits...')
+    props.setProperty(getStatusKey(uniqueKey), `Waiting a minute to avoid hitting api limits. Users are limited to 1000 requests/minute...`);
     Utilities.sleep(60000)
   }
 
@@ -464,6 +483,7 @@ function generateKeys(config, uniqueKey) {
   // props.deleteProperty(uniqueKey + "total");
 
   //divide by return field length because incremented on per-column basis
+  props.setProperty(getStatusKey(uniqueKey), `Done! Generated ${totalPlaceKeys} Placekeys.`);
   return totalPlaceKeys;
 }
 

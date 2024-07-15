@@ -290,7 +290,7 @@
 
       
 
-      let status;
+      let statusInterval;
 
       function generateKeys() {
         document.getElementById("generate").disabled = true;
@@ -387,12 +387,12 @@
 
         google.script.run.withFailureHandler(failedAPI).withSuccessHandler(generateKeysToast).generateKeys(config, key);
 
-        if (status) {
-          clearInterval(status);
+        if (statusInterval) {
+          clearInterval(statusInterval);
         }
 
         // every 2s later show status
-        status = setInterval(() => {
+        statusInterval = setInterval(() => {
           google.script.run
             .withFailureHandler((err) => console.log("status", err))
             .withSuccessHandler(showCurrentStatus)
@@ -401,28 +401,25 @@
       }
 
       function showCurrentStatus(e) {
-        const { key, value, total } = e ?? {};
+        const status = e ?? {};
+        console.log('STATUS ', status)
         
-        if (key == window.key && value) {
-          if(value == total){
-            document.getElementById("generateToast").innerHTML =  "Inserting...";
-            if (status) {
-              clearInterval(status);
+        if (key == window.key && status) {
+          document.getElementById("generateToast").innerHTML =  status;
+           if (status.indexOf("Done!")!==-1) {
+              clearInterval(statusInterval);
               window.key = null;
-            }
-          } else{
-            document.getElementById("generateToast").innerHTML =  `Processing ${value}/${total} addresses.`;
           }
         }
       }
 
       function failedAPI(e) {
-        console.log('ERROR ', e)
-        document.getElementById("generateToast").innerHTML = "Something went wrong. Please try again!";
+        // console.log('ERROR ', e.message)
+        document.getElementById("generateToast").innerHTML = e.message;
         document.getElementById("generate").disabled = false;
 
-        if (status) {
-          clearInterval(status);
+        if (statusInterval) {
+          clearInterval(statusInterval);
           window.key = null;
         }
       }
@@ -437,8 +434,8 @@
         document.getElementById("generate").disabled = false;
         console.log("sent");
 
-        if (status) {
-          clearInterval(status);
+        if (statusInterval) {
+          clearInterval(statusInterval);
           window.key = null;
         }
       }
