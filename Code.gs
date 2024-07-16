@@ -410,7 +410,7 @@ function generateKeys(config, uniqueKey) {
     console.log(res.getContentText())
     let message = "Something went wrong. Please try again."
     if(res.getResponseCode()===429){
-      message = "Rate limit exceeded. Please visit <strong>https://www.placekey.io/pricing</strong> to upgrade."
+      message = `Rate limit exceeded. See <a  href="https://www.placekey.io/pricing" target="_blank">here</a> to upgrade.`
     }
     if(res.getResponseCode()==400){
       message = `The API returned an error because at least one row between ${sortedValidRows[i*STEP]+2} and ${sortedValidRows[(i*STEP)+STEP-1]+2} is malformed.`
