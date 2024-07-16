@@ -136,8 +136,9 @@ function generateKeys(config, uniqueKey) {
   const NO_INPUT_STRING = "--"
   const ERROR_KEY = "placekey_error"
   const EMPTY_ROW_ERROR_MESSAGE = "There were no values in the row."
+  const baseFields = INSERT_ERROR ? ["placekey", ERROR_KEY] : ["placekey"]
 
-  const fields = Object.fromEntries(["placekey", ERROR_KEY].concat(requestFields).map((field_name) => [field_name, {apiKey: field_name, displayName: field_name.split("_").map((word) => word.charAt(0).toUpperCase() + word.slice(1)).join(" "), columnIndex: null}]))
+  const fields = Object.fromEntries(baseFields.concat(requestFields).map((field_name) => [field_name, {apiKey: field_name, displayName: field_name.split("_").map((word) => word.charAt(0).toUpperCase() + word.slice(1)).join(" "), columnIndex: null}]))
   
       
   let now = new Date();
@@ -403,14 +404,13 @@ function generateKeys(config, uniqueKey) {
     'muteHttpExceptions': true
   };
   let res = UrlFetchApp.fetch("https://api.placekey.io/v1/placekeys", requestOptions);
-
-  
+ 
   if(res.getResponseCode() != 200){
     console.log('RES WITH ERROR STATUS CODE ', res.getResponseCode())
     console.log(res.getContentText())
     let message = "Something went wrong. Please try again."
     if(res.getResponseCode()===429){
-      message = "Number of requests exceeded the free tier limit of 10,000 requests/day."
+      message = "Rate limit exceeded. Please visit <strong>https://www.placekey.io/pricing</strong> to upgrade."
     }
     if(res.getResponseCode()==400){
       message = `The API returned an error because at least one row between ${sortedValidRows[i*STEP]+2} and ${sortedValidRows[(i*STEP)+STEP-1]+2} is malformed.`
@@ -444,10 +444,22 @@ function generateKeys(config, uniqueKey) {
       // console.log('field ', field)
       const fieldObj = fields[field]
 
-      ss.getRange(1, fieldObj.columnIndex+1, 1, 1).setValue(fieldObj.displayName)
+      if(field!=="geocode"){
+        ss.getRange(1, fieldObj.columnIndex+1, 1, 1).setValue(fieldObj.displayName)
+      }
       for(let index=0; index<batchIndexes[i].length; index++){
         let rowNumber = Number.parseInt(batchIndexes[i][index])+2
         let valueToAdd = json[index][field]
+        if(field==="geocode"){
+          let headersToAdd = ["Geocode Latitude", "Geocode Longitude", "Geocode lat-long", "Geocode Precision"]
+          
+          //latitude, longitude, lat-long (which is just combining), and geocode_precision
+          ss.getRange(1, fieldObj.columnIndex, 1, headersToAdd.length).setValues([headersToAdd])
+          
+          let { location, location_type } = valueToAdd
+          ss.getRange(rowNumber, fieldObj.columnIndex, 1, 4).setValues([[location.lat, location.lng, `(${location.lat}, ${location.lng})`, location_type]])
+          continue
+        }
         // console.log('Adding value ', valueToAdd, ' to row ', rowNumber, ' and column ', fieldObj.columnIndex+1)
         ss.getRange(rowNumber, fieldObj.columnIndex+1, 1, 1).setValue(valueToAdd)
       }
@@ -466,14 +478,16 @@ function generateKeys(config, uniqueKey) {
   }
   totalPlaceKeys+=batchIndexes[i].length
 
-  if(totalPlaceKeys%1000===0){
-    console.log('Waiting a minute to avoid hitting api limits...')
-    props.setProperty(getStatusKey(uniqueKey), `Waiting a minute to avoid hitting api limits. Users are limited to 1000 requests/minute...`);
-    Utilities.sleep(60000)
+  // if(totalPlaceKeys%1000===0){
+  //   console.log('Waiting a minute to avoid hitting api limits...')
+  //   props.setProperty(getStatusKey(uniqueKey), `Waiting a minute to avoid hitting api limits. Users are limited to 1000 requests/minute...`);
+  //   Utilities.sleep(60000)
+  // }
+
+  Utilities.sleep(6000);
   }
 
-  Utilities.sleep(1000);
-  }
+  console.log(`It took ${new Date() - now_} s to insert ${sortedValidRows.length} responses into the document`)
 
   console.log(`inserting time(total): ${new Date() - now}`)
   console.log(`inserting time: ${new Date() - now_}`)

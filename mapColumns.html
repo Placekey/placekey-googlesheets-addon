@@ -401,8 +401,8 @@
       }
 
       function showCurrentStatus(e) {
-        const status = e ?? {};
-        console.log('STATUS ', status)
+        const status = e ?? "Loading...";
+        // console.log('STATUS ', status)
         
         if (key == window.key && status) {
           document.getElementById("generateToast").innerHTML =  status;
@@ -416,6 +416,8 @@
       function failedAPI(e) {
         // console.log('ERROR ', e.message)
         document.getElementById("generateToast").innerHTML = e.message;
+
+
         document.getElementById("generate").disabled = false;
 
         if (statusInterval) {
