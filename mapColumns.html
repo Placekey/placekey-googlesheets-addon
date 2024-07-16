@@ -112,6 +112,12 @@
             <option value="Sheet1">Sheet1</option>
           </select>
         </div>
+
+        <hr class="hr mt-15" />
+
+        <p id="additionalnputs"onclick="toggleAdditionalInputs()">Click to provide additional inputs</p>
+        <div id="metadataInputs"
+        style="display: none;">
         <div class="form__group mt-20">
           <label for="phone_number" class="form__label"> <strong>Phone Number</strong> - e.g. 1234567890</label>
           <select id="phone_number" class="selectCols form__control">US
@@ -150,6 +156,8 @@
             <option value="Sheet1">Sheet1</option>
           </select>
         </div>
+        </div>
+        <hr class="hr mt-15" />
 
         <div class="form__group text-12 mt-25">
           <!-- disabled checkbox code -->
@@ -231,6 +239,12 @@
         },
         false
       );
+
+      function toggleAdditionalInputs(e){
+        document.getElementById("metadataInputs").style.display = document.getElementById("metadataInputs").style.display==="none" ? "block": "none";
+
+        document.getElementById("additionalnputs").innerHTML = document.getElementById("metadataInputs").style.display==="none" ? "Click Here to Provide Additional Inputs": "Close";
+      }
 
       function getSheetsToast(e) {
         console.log(e);
