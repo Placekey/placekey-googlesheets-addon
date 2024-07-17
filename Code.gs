@@ -4,17 +4,13 @@ function onInstall(e) {
 }
 
 function onOpen(e) {
-  console.log('Hello from startup')
   var ui = SpreadsheetApp.getUi();
   var menu = ui.createAddonMenu();
-  console.log("Created menu")
   menu.addItem("Generate Placekeys", "PlaceKey").addSeparator().addItem("Additional Information", "feedback");
   menu.addToUi();
-  console.log("menu added to ui")
 }
 
 function feedback() {
-  console.log('Hello from the feedback')
   var htmlOutput = HtmlService.createTemplateFromFile("Help").evaluate().setWidth(350).setHeight(350);
   SpreadsheetApp.getUi().showModalDialog(htmlOutput, "Placekey Help");
 }
@@ -24,22 +20,18 @@ function feedback() {
 function PlaceKey() {
   var userPr = PropertiesService.getUserProperties();
   var userKey = userPr.getProperty("Key");
-  console.log('The user key is ', userKey)
-  console.log('Hello from the log')
   if (!userKey) {
     var htmlOutput = HtmlService.createTemplateFromFile("setKey").evaluate().setWidth(500).setHeight(150);
     SpreadsheetApp.getUi().showModalDialog(htmlOutput, "API Key");
   } else {
     var htmlOutput = HtmlService.createTemplateFromFile("mapColumns").evaluate().append('<input id="storedKey" value="" style="display:none">').setTitle("Placekey");
     SpreadsheetApp.getUi().showSidebar(htmlOutput);
-    console.log('You should be seeing the menu now')
   }
 }
 
 // Set API Key
 
 function setUserProperties(els) {
-  console.log("Hello from setUserProperties")
   var userPr = PropertiesService.getUserProperties();
   var userKey = userPr.setProperty("Key", els);
   // Code below added to accomplish point 3
@@ -56,7 +48,6 @@ function setUserProperties(els) {
 // Displays the API Key window
 
 function changeKey() {
-  console.log("Hello from changeKey")
   var userPr = PropertiesService.getUserProperties();
   var userKey = userPr.getProperty("Key");
   var htmlOutput = HtmlService.createTemplateFromFile("setKey")
@@ -70,7 +61,6 @@ function changeKey() {
 // Gets all sheets in current spreadsheet, It also check current sheet columns
 
 function getSheets() {
-  console.log("Hello from getSheets")
   var active = SpreadsheetApp.getActiveSheet().getName();
   var allSheets = SpreadsheetApp.getActiveSpreadsheet().getSheets();
   var sheetNames = [];
@@ -92,7 +82,6 @@ function getSheets() {
 // It's changing the active sheet if user selects another sheet as data source
 
 function changeSheet(selectedSheet) {
-  console.log("Hello from changeSheet")
   var selected = SpreadsheetApp.getActiveSpreadsheet().getSheetByName(selectedSheet);
   SpreadsheetApp.setActiveSheet(selected);
   try {
@@ -108,12 +97,8 @@ function changeSheet(selectedSheet) {
 const getStatusKey = (key) => key+"status"
 // get processing status
 function getStatus(key) {
-  console.log('KEY RECEIVED FROM GET STATUS CALL ', key)
-  console.log("Hello from getStatus")
   let props = PropertiesService.getDocumentProperties();
-  console.log('PROPS ', props.getProperties())
   let status = props.getProperty(getStatusKey(key));
-  console.log('GOT STATUS ', status)
   return status;
 }
 
@@ -136,7 +121,14 @@ function generateKeys(config, uniqueKey) {
   const NO_INPUT_STRING = "--"
   const ERROR_KEY = "placekey_error"
   const EMPTY_ROW_ERROR_MESSAGE = "There were no values in the row."
+  const geocodeFields = ["geocode_latitude", "geocode_longitude", "geocode_lat_long", "geocode_precision"]
   const baseFields = INSERT_ERROR ? ["placekey", ERROR_KEY] : ["placekey"]
+
+  if(requestFields.includes("geocode")){
+    for(let field of geocodeFields){
+      requestFields.push(field)
+    }
+  }
 
   const fields = Object.fromEntries(baseFields.concat(requestFields).map((field_name) => [field_name, {apiKey: field_name, displayName: field_name.split("_").map((word) => word.charAt(0).toUpperCase() + word.slice(1)).join(" "), columnIndex: null}]))
   
@@ -148,15 +140,13 @@ function generateKeys(config, uniqueKey) {
   var sheetId = ss.getSheetId();
   //colsNum is somewhat misleading bc if the sheet has tons of blank columns on the end, the blanks are included in the count
   var colsNum = ss.getLastColumn();
-  console.log('COLS NUMBER ', colsNum)
+
   /* 
   cols header is used to determine where to add the new columns if no columns named for the outputs already exist in the document.
   **The logic will break if a sheet has a column with no header in between columns with headers.**
   */
   var colsHeader = ss.getRange(1, 1, 1, colsNum).getDisplayValues()[0].filter(header=>header.length>0);
   
-
-  console.log('COLS HEADER ', colsHeader)
   var colsId = [];
   var problematicRows = [];
   var key = ["location_name", "street_address", "city", "region", "postal_code", "latitude", "longitude", "iso_country_code"];
@@ -176,8 +166,6 @@ function generateKeys(config, uniqueKey) {
     }
   }
 
-  console.log('COL MAPPINGS WITH COLUMN NUMBERS ', columnMappings)
-
   var rowNum = ss.getLastRow();
   console.log(`There are ${rowNum-1} rows in the document`)
   
@@ -185,6 +173,9 @@ function generateKeys(config, uniqueKey) {
   //If there's already a column in the document for all the fields, get it and save it, otherwise, append it to the end
   let appendedFields = 0
   for( let [key, value] of Object.entries(fields)){
+    if(key==="geocode"){
+      continue
+    }
     lowerCaseCols = colsHeader.map(name => name.toLowerCase())
     if(lowerCaseCols.includes(value.displayName.toLowerCase())){
       fields[key].columnIndex = lowerCaseCols.indexOf(value.displayName.toLowerCase())
@@ -196,13 +187,10 @@ function generateKeys(config, uniqueKey) {
 
   }
 
-  console.log('FIELD DICT ', fields)
-
   console.log(`Before get Values time: ${new Date() - now}`)
   now_ = new Date();
 
   var allRowsValues = ss.getRange(2, 1, ss.getLastRow() - 1, ss.getLastColumn()).getDisplayValues();
-  // console.log('ALL ROW VALUES ', allRowsValues)
 
   console.log(`get Values time(total): ${new Date() - now}`)
   console.log(`get Values time: ${new Date() - now_}`)
@@ -258,35 +246,44 @@ function generateKeys(config, uniqueKey) {
     }
     return true
     } 
+
   //determines if a row has enough inputs to be valid
   const isValidRow = (row) => {
-      // return {
-      //     isValid: true,
-      //     message: "The row is valid"
-      //   }
     const rowObj = mapRowToObject(row)
-    console.log('ROW OBJ ', rowObj)
-    const keysWithValues = Object.keys(rowObj).filter( key => rowObj[key].length > 0)
-    // console.log('keysWithValues ', keysWithValues)
+
+    let keysWithValues = Object.keys(rowObj).filter( key => rowObj[key].length > 0)
+    
     /*
     if no keys are provided or only the country is provided, the row is considered empty (we add default value of 'US' to row if no country provided)
     */
     if(keysWithValues.length===0 || (keysWithValues.length===1 && keysWithValues[0]==="iso_country_code")){
       return {
         isValid: false,
-        message: EMPTY_ROW_ERROR_MESSAGE
+        message: EMPTY_ROW_ERROR_MESSAGE,
+        row: rowObj
       }
     }
 
     const minimumInputs = [["latitude", "longitude"], ["street_address", "city", "region", "postal_code", "iso_country_code"], ["street_address", "region", "postal_code", "iso_country_code"],["street_address", "city", "region", "iso_country_code"]]
     
     
-    //if lat and long are provided, they must be valid float values, even if other fields are provided
-    if(!hasValidLatLongValues(rowObj, keysWithValues)){
-      return {
-        isValid: false,
-        message: "An invalid number value was provided for latitude or longitude."
+    /*
+    if only lat and long are provided, they must be valid. If more values are provided and lat long aren't valid,
+     drop them from the row, because they'll cause the row to fail if input into the api
+    */
+    if(keysWithValues.includes("latitude") && keysWithValues.includes("longitude") && !hasValidLatLongValues(rowObj, keysWithValues)){
+      if(keysWithValues.length==2){
+        return {
+          isValid: false,
+          message: "The value provided for latitude or longitude was invalid.",
+          row: rowObj
+        }
       }
+
+      delete rowObj["latitude"]
+      delete rowObj["longitude"]
+      
+      keysWithValues = keysWithValues.filter( key => key!=="latitude" && key!=="longitude")
     }
     
     for(let input of minimumInputs){
@@ -300,13 +297,15 @@ function generateKeys(config, uniqueKey) {
       if(hasRequiredInputs){
         return {
           isValid: true,
-          message: "The row is valid"
+          message: "The row is valid",
+          row: rowObj
         }
       }
     }
     return {
       isValid: false,
-      message: "Row did not meet minimum input requirements. Details can be found here: https://docs.placekey.io/documentation/placekey-api/input-parameters/minimum-inputs"
+      message: "Row did not meet minimum input requirements. Details can be found here: https://docs.placekey.io/documentation/placekey-api/input-parameters/minimum-inputs",
+      row: rowObj 
     }
   }
 
@@ -315,9 +314,7 @@ function generateKeys(config, uniqueKey) {
   let errorRows = {}
   props.setProperty(getStatusKey(uniqueKey), `Loading ${rowNum-1} rows from the document...`);
   for(let i = 0; i < allRowsValues.length; i++){
-    
-    // console.log('ROW VALUES[i] ', allRowsValues[i])
-    const {isValid, message} = isValidRow(allRowsValues[i])
+    const {isValid, message, row } = isValidRow(allRowsValues[i])
      if(!isValid){
         //only save error messages for non-empty rows that the user might think should be processed
         if(INSERT_ERROR && message!==EMPTY_ROW_ERROR_MESSAGE){
@@ -326,7 +323,7 @@ function generateKeys(config, uniqueKey) {
         console.log(`Row ${i+1} is invalid. Message: ${message}`)
         continue
       }
-    validRows[i] = allRowsValues[i]
+    validRows[i] = row
   }
 
   props.setProperty(getStatusKey(uniqueKey), `Finshed loading ${rowNum-1} rows. ${Object.keys(validRows).length}/${rowNum-1} rows are valid.`);
@@ -338,7 +335,6 @@ function generateKeys(config, uniqueKey) {
 
   let sortedInvalidRows = Object.keys(errorRows).map(numString => Number.parseInt(numString))
   sortedInvalidRows.sort((a, b)=>a-b)
-  console.log('SORTED ERROR INDEXES ', sortedInvalidRows)
 
   let batchIndexes = []
   
@@ -348,19 +344,16 @@ function generateKeys(config, uniqueKey) {
     let batch = []
     
     for(let index of rowIndexes){
-      let row = validRows[index]
-      batch.push(mapRowToObject(row))
+      batch.push(validRows[index])
     }
     batches.push(batch)
   }
 
   now_ = new Date()
 
-  // console.log(countryWiseRows);
   var totalPlaceKeys = 0;
 
-  // processing status
-  let currentRequestCount = 0;
+
 
   now_ = new Date()
 
@@ -375,12 +368,10 @@ function generateKeys(config, uniqueKey) {
 
   var userPr = PropertiesService.getUserProperties();
   var API_Key = userPr.getProperty("Key");
-  console.log('API KEY ', API_Key)
 
   for(let i = 0; i < batches.length; i++){
     let batch = batches[i]
     props.setProperty(getStatusKey(uniqueKey), `Fetching Placekeys for ${batch.length+(i*STEP)}/${sortedValidRows.length} valid rows...`);
-    // console.log('batch ', batch)
      let body = {
         queries: batch,
         options: {
@@ -389,7 +380,7 @@ function generateKeys(config, uniqueKey) {
           fields: requestFields
         }
       }
-    // console.log('REQUEST DATA ', body)
+    console.log('REQUEST DATA ', body)
 
     var requestOptions = {
     'method' : 'post',
@@ -406,16 +397,18 @@ function generateKeys(config, uniqueKey) {
   let res = UrlFetchApp.fetch("https://api.placekey.io/v1/placekeys", requestOptions);
  
   if(res.getResponseCode() != 200){
-    console.log('RES WITH ERROR STATUS CODE ', res.getResponseCode())
-    console.log(res.getContentText())
     let message = "Something went wrong. Please try again."
     if(res.getResponseCode()===429){
       message = `Rate limit exceeded. See <a  href="https://www.placekey.io/pricing" target="_blank">here</a> to upgrade.`
     }
-    if(res.getResponseCode()==400){
-      message = `The API returned an error because at least one row between ${sortedValidRows[i*STEP]+2} and ${sortedValidRows[(i*STEP)+STEP-1]+2} is malformed.`
+    else if(res.getResponseCode()==400){
+      message = `The API returned an error because at least one row between ${sortedValidRows[i*STEP]+2} and ${sortedValidRows[(i*STEP)+batch.length-1]+2} is malformed.`
+    }
+    else{
+      message = `The api failed with an unrecognized status code of ${res.getResponseCode()}`
     }
     props.setProperty(getStatusKey(uniqueKey), message);
+    console.error("Failed request response: ", res.getContentText())
     throw new Error(message)
   }
 
@@ -425,43 +418,57 @@ function generateKeys(config, uniqueKey) {
     console.log('No responses returned from the api, continuing to next batch if one exists...')
     continue
   }
-  // console.log('JSON RESPONSE ', json)
+  
   const returnedFields = Object.keys(json[0]).filter(field => field!=="query_id")
+ 
   //remove any fields we wanted to retrieve but were not returned
   for(let key of Object.keys(fields)){
-          if(key!=="placekey_error" && !returnedFields.includes(key)){
+          if(key!=="placekey_error" && !geocodeFields.includes(key) && !returnedFields.includes(key)){
             console.log(`The key ${key} is not present in the api response, dropping from configured fields...`)
             delete fields[key]
           }
         }
 
-  // console.log('Batch indexes ', batchIndexes)
-  
-  const columnHeadersToAdd = Object.values(fields).filter(field => returnedFields.includes(field.apiKey)).map(field => field.displayName)
-
 
   for(let field of returnedFields){
-      // console.log('field ', field)
       const fieldObj = fields[field]
-
-      if(field!=="geocode"){
+      
+      if(field==="geocode"){
+          for(let geoField of geocodeFields){
+            ss.getRange(1, fields[geoField].columnIndex+1, 1, 1).setValue(fields[geoField].displayName)
+          }
+      }
+      else{
         ss.getRange(1, fieldObj.columnIndex+1, 1, 1).setValue(fieldObj.displayName)
       }
+      
       for(let index=0; index<batchIndexes[i].length; index++){
         let rowNumber = Number.parseInt(batchIndexes[i][index])+2
         let valueToAdd = json[index][field]
+
         if(field==="geocode"){
-          let headersToAdd = ["Geocode Latitude", "Geocode Longitude", "Geocode lat-long", "Geocode Precision"]
-          
-          //latitude, longitude, lat-long (which is just combining), and geocode_precision
-          ss.getRange(1, fieldObj.columnIndex, 1, headersToAdd.length).setValues([headersToAdd])
-          
-          let { location, location_type } = valueToAdd
-          ss.getRange(rowNumber, fieldObj.columnIndex, 1, 4).setValues([[location.lat, location.lng, `(${location.lat}, ${location.lng})`, location_type]])
-          continue
+          for(let geoField of geocodeFields){
+            let range = ss.getRange(rowNumber, fields[geoField].columnIndex+1, 1, 1)
+            switch(geoField){
+            case "geocode_latitude":
+              range.setValue(valueToAdd.location.lat);
+              continue;
+            case "geocode_longitude":
+              range.setValue(valueToAdd.location.lng)
+              continue;
+            case "geocode_lat_long":
+              range.setValue(`(${valueToAdd.location.lat}, ${valueToAdd.location.lng})`)
+              continue;
+            case "geocode_precision":
+              range.setValue(valueToAdd.location_type)
+              continue;
+          }
         }
-        // console.log('Adding value ', valueToAdd, ' to row ', rowNumber, ' and column ', fieldObj.columnIndex+1)
+       }
+       else {
         ss.getRange(rowNumber, fieldObj.columnIndex+1, 1, 1).setValue(valueToAdd)
+       }
+       
       }
   }
 
@@ -472,17 +479,11 @@ function generateKeys(config, uniqueKey) {
      for(let index=0; index<sortedInvalidRows.length; index++){
         let rowNumber = Number.parseInt(sortedInvalidRows[index])+2
         let valueToAdd = errorRows[sortedInvalidRows[index]]
-        console.log('Adding value ', valueToAdd, ' to row ', rowNumber, ' and column ', fieldObj.columnIndex+1)
+        // console.log('Adding value ', valueToAdd, ' to row ', rowNumber, ' and column ', fieldObj.columnIndex+1)
         ss.getRange(rowNumber, fieldObj.columnIndex+1, 1, 1).setValue(valueToAdd)
       }
   }
   totalPlaceKeys+=batchIndexes[i].length
-
-  // if(totalPlaceKeys%1000===0){
-  //   console.log('Waiting a minute to avoid hitting api limits...')
-  //   props.setProperty(getStatusKey(uniqueKey), `Waiting a minute to avoid hitting api limits. Users are limited to 1000 requests/minute...`);
-  //   Utilities.sleep(60000)
-  // }
 
   Utilities.sleep(6000);
   }
@@ -492,10 +493,6 @@ function generateKeys(config, uniqueKey) {
   console.log(`inserting time(total): ${new Date() - now}`)
   console.log(`inserting time: ${new Date() - now_}`)
 
-
-  // props.deleteProperty(uniqueKey);
-  // props.deleteProperty(uniqueKey + "total");
-
   //divide by return field length because incremented on per-column basis
   props.setProperty(getStatusKey(uniqueKey), `Done! Generated ${totalPlaceKeys} Placekeys.`);
   return totalPlaceKeys;
@@ -504,7 +501,6 @@ function generateKeys(config, uniqueKey) {
 // Reset user Propertise, For test
 
 function reset() {
-  console.log("Hello from reset")
   var userPr = PropertiesService.getUserProperties();
   userPr.deleteAllProperties();
   resetMapColumnsData();
@@ -512,7 +508,6 @@ function reset() {
 
 // For test
 function testUser() {
-  console.log("Hello from testUser")
   var ss = SpreadsheetApp.getActiveSpreadsheet();
   var sheet = ss.getActiveSheet();
 
@@ -520,9 +515,7 @@ function testUser() {
 }
 
 // Insert Sample data, Please fill or remove remainings.
-
 function insertSample() {
-  console.log("Hello from insertSample")
   var ss = SpreadsheetApp.getActiveSheet();
   var Name = ss.getName();
   ss.appendRow(["Name", "Street Address", "City", "State", "Zip code", "Latitude", "Longitude"]);
@@ -533,13 +526,6 @@ function insertSample() {
   ss.appendRow(["Tasty Hand Pulled Noodle", "1 Doyers St", "New York", "ny", "10013", "", ""]);
   ss.appendRow(["", "1 Doyers St", "New York", "NY", "10013", "", ""]);
 
-  // Please fill or remove remainings:
-
-  // ss.appendRow(['Name', 'Street Address', 'City', 'State', 'Zip code', 'Latitude', 'Longitude'])
-  // ss.appendRow(['Name', 'Street Address', 'City', 'State', 'Zip code', 'Latitude', 'Longitude'])
-  // ss.appendRow(['Name', 'Street Address', 'City', 'State', 'Zip code', 'Latitude', 'Longitude'])
-  // ss.appendRow(['Name', 'Street Address', 'City', 'State', 'Zip code', 'Latitude', 'Longitude'])
-
   PlaceKey();
 
   return { cols: false, mapData: [] };
@@ -548,18 +534,15 @@ function insertSample() {
 // Alerts
 
 function Alert(message) {
-  console.log("hello from alert")
   SpreadsheetApp.getUi().alert(message);
 }
 
 // Template Functions
 function include(filename) {
-  console.log("hello from include")
   return HtmlService.createHtmlOutputFromFile(filename).getContent();
 }
 
 function refreshUpdateSheet() {
-  console.log("hello from refreshUpdateSheet")
   var ss = SpreadsheetApp.getActiveSpreadsheet();
   var allSheets = ss.getSheets();
   var sheetName = ss.getActiveSheet().getName();
@@ -584,14 +567,12 @@ const ADD_ON_NAME = "Placekey:";
 
 // set mapColumns Data
 function setMapColumnsData(sheetId, data) {
-  console.log("hello from setMapColumnsData")
   const props = PropertiesService.getDocumentProperties();
   props.setProperty(ADD_ON_NAME + sheetId, JSON.stringify(data));
 }
 
 // get map Columns Data
 function getMapColumnsData(sheetId) {
-  console.log("hello from getMapColumnsData")
   const props = PropertiesService.getDocumentProperties();
   let data = props.getProperty(ADD_ON_NAME + sheetId);
   return JSON.parse(data);
@@ -599,7 +580,6 @@ function getMapColumnsData(sheetId) {
 
 // reset map Columns Data
 function resetMapColumnsData() {
-  console.log("hello from resetMapColumnsData")
   const props = PropertiesService.getDocumentProperties();
   props.getKeys().forEach((v) => {
     if (v.includes(ADD_ON_NAME)) {
@@ -610,7 +590,6 @@ function resetMapColumnsData() {
 
 // print all document property
 function printAllDocumentProperty() {
-  console.log("hello from printAllDocumentProperty")
   const props = PropertiesService.getDocumentProperties();
   let allProps = props.getProperties();
   for (let key in allProps) {
