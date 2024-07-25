@@ -490,7 +490,7 @@ function onInstall(e) {
     let msSinceRequestMade = new Date()-timeHitApi
     //only wait if it hasn't been a second since the last request was made
     if(msSinceRequestMade < 1000){
-      let timeToWait = 1000-msSinceRequestMade
+      let timeToWait = 1100-msSinceRequestMade
       Utilities.sleep(timeToWait);
       console.log('Waiting ', timeToWait, ' ms before making next request')
     }
