@@ -38,75 +38,43 @@
         </div>
 
         <div class="field" data-field="location_name">
-          <div class="field__row">
-            <span class="field__dot" aria-hidden="true"></span>
-            <label for="location_name" class="field__label" title="Business or place name, e.g. Twin Peaks Petroleum">Location Name</label>
-          </div>
+          <label for="location_name" class="field__label" title="Business or place name, e.g. Twin Peaks Petroleum"> <span class="field__dot" aria-hidden="true"></span> Location Name </label>
           <select id="location_name" class="selectCols"></select>
-          <div class="field__example">e.g. Twin Peaks Petroleum</div>
         </div>
 
         <div class="field" data-field="street_address">
-          <div class="field__row">
-            <span class="field__dot" aria-hidden="true"></span>
-            <label for="street_address" class="field__label" title="Street address, e.g. 598 Portola Dr">Street Address</label>
-          </div>
+          <label for="street_address" class="field__label" title="Street address, e.g. 598 Portola Dr"> <span class="field__dot" aria-hidden="true"></span> Street Address </label>
           <select id="street_address" class="selectCols"></select>
-          <div class="field__example">e.g. 598 Portola Dr</div>
         </div>
 
         <div class="field" data-field="city">
-          <div class="field__row">
-            <span class="field__dot" aria-hidden="true"></span>
-            <label for="city" class="field__label" title="City or town">City</label>
-          </div>
+          <label for="city" class="field__label" title="City or town"> <span class="field__dot" aria-hidden="true"></span> City </label>
           <select id="city" class="selectCols"></select>
-          <div class="field__example">e.g. San Francisco</div>
         </div>
 
         <div class="field" data-field="region">
-          <div class="field__row">
-            <span class="field__dot" aria-hidden="true"></span>
-            <label for="region" class="field__label" title="US state · Canadian province · UK county">Region</label>
-          </div>
+          <label for="region" class="field__label" title="US state · Canadian province · UK county"> <span class="field__dot" aria-hidden="true"></span> Region </label>
           <select id="region" class="selectCols"></select>
-          <div class="field__example">state, province, or county</div>
         </div>
 
         <div class="field" data-field="postal_code">
-          <div class="field__row">
-            <span class="field__dot" aria-hidden="true"></span>
-            <label for="postal_code" class="field__label" title="US: 94131 · Canada: M5V 3A8 · UK: SW1A 1AA">Postal Code</label>
-          </div>
+          <label for="postal_code" class="field__label" title="US: 94131 · Canada: M5V 3A8 · UK: SW1A 1AA"> <span class="field__dot" aria-hidden="true"></span> Postal Code </label>
           <select id="postal_code" class="selectCols"></select>
-          <div class="field__example">zip, postal code, or postcode</div>
         </div>
 
         <div class="field" data-field="latitude">
-          <div class="field__row">
-            <span class="field__dot" aria-hidden="true"></span>
-            <label for="latitude" class="field__label" title="Latitude in decimal degrees">Latitude</label>
-          </div>
+          <label for="latitude" class="field__label" title="Latitude in decimal degrees"> <span class="field__dot" aria-hidden="true"></span> Latitude </label>
           <select id="latitude" class="selectCols"></select>
-          <div class="field__example">e.g. 37.7371</div>
         </div>
 
         <div class="field" data-field="longitude">
-          <div class="field__row">
-            <span class="field__dot" aria-hidden="true"></span>
-            <label for="longitude" class="field__label" title="Longitude in decimal degrees">Longitude</label>
-          </div>
+          <label for="longitude" class="field__label" title="Longitude in decimal degrees"> <span class="field__dot" aria-hidden="true"></span> Longitude </label>
           <select id="longitude" class="selectCols"></select>
-          <div class="field__example">e.g. -122.44283</div>
         </div>
 
         <div class="field" data-field="iso_country_code">
-          <div class="field__row">
-            <span class="field__dot" aria-hidden="true"></span>
-            <label for="iso_country_code" class="field__label" title="ISO 3166-1 alpha-2 code: US, CA, GB">Country</label>
-          </div>
+          <label for="iso_country_code" class="field__label" title="ISO 3166-1 alpha-2 code: US, CA, GB"> <span class="field__dot" aria-hidden="true"></span> Country </label>
           <select id="iso_country_code" class="selectCols"></select>
-          <div class="field__example">ISO code, e.g. US</div>
         </div>
 
         <details class="disclosure" id="disclosure-returns" open>
@@ -496,8 +464,7 @@
         // Check each minimum set
         for (const set of MINIMUM_INPUTS) {
           if (set.every((k) => mapped.includes(k))) {
-            if (set.length === 2) return { kind: "ready", text: "✓ Lat/Lng ready" };
-            return { kind: "ready", text: "✓ Address ready" };
+            return { kind: "ready", text: "✓ Ready" };
           }
         }
         // Not yet satisfied — compute the smallest gap

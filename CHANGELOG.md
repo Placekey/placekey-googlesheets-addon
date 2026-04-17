@@ -30,6 +30,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Normalized delimiter variants in auto-map (`Store ID`, `store_id`, `store-id`, `StoreID` all match the same canonical field).
 - CI Node.js version bumped to 24.
 - README rewritten to reflect the current installation flow (template-copy distribution) and feature set.
+- Field mapping rows switched to a compact 2-column grid (label left, select right) with a fixed 110px label column so all fields line up vertically.
+- Simplified the readiness status chip from "✓ Lat/Lng ready" / "✓ Address ready" variants to a single "✓ Ready".
+- README Installation section rewritten with a detailed step-by-step first-run guide (copy link, Make a copy, waiting for the Extensions menu, approving the "unverified app" warning, entering the API key) and a new "Updating to a newer version" section.
 
 ### Fixed
 
