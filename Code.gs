@@ -67,7 +67,13 @@ function saveLearnedAliases(columnMappings) {
   const aliases = getLearnedAliases();
   for (const [fieldId, columnName] of Object.entries(columnMappings)) {
     if (columnName === NO_INPUT_STRING || !columnName) continue;
-    aliases[columnName.toLowerCase().trim()] = fieldId;
+    // Normalize to match client-side computeAutomap: lowercase, trimmed,
+    // delimiters (spaces/underscores/hyphens/dots) stripped.
+    const key = columnName
+      .toLowerCase()
+      .trim()
+      .replace(/[\s_\-.]+/g, "");
+    aliases[key] = fieldId;
   }
   PropertiesService.getUserProperties().setProperty(LEARNED_ALIASES_KEY, JSON.stringify(aliases));
 }

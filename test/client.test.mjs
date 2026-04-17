@@ -284,7 +284,8 @@ describe("computeAutomap", () => {
   });
 
   it("learned aliases map custom headers to fields", () => {
-    const learned = { location_n: "location_name", biz_street: "street_address" };
+    // Learned alias keys are normalized (stripped of delimiters) same as built-ins
+    const learned = { locationn: "location_name", bizstreet: "street_address" };
     const result = client.computeAutomap(["Location_N", "Biz_Street", "City"], learned);
     expect(result.location_name).toBe("Location_N");
     expect(result.street_address).toBe("Biz_Street");
@@ -305,10 +306,62 @@ describe("computeAutomap", () => {
     expect(result.city).toBe("City");
   });
 
-  it("learned aliases are case-insensitive on lookup", () => {
-    const learned = { location_n: "location_name" };
-    const result = client.computeAutomap(["LOCATION_N", "  location_n  "], learned);
-    expect(result.location_name).toBe("LOCATION_N");
+  it("learned aliases match across delimiter variants", () => {
+    // Same learned alias matches different delimiter styles
+    const learned = { locationn: "location_name" };
+    expect(client.computeAutomap(["Location_N"], learned).location_name).toBe("Location_N");
+    expect(client.computeAutomap(["Location N"], learned).location_name).toBe("Location N");
+    expect(client.computeAutomap(["location-n"], learned).location_name).toBe("location-n");
+    expect(client.computeAutomap(["LOCATIONN"], learned).location_name).toBe("LOCATIONN");
+  });
+
+  it("built-in aliases match across delimiter variants", () => {
+    // "Store ID", "store_id", "store-id", "StoreID" all map to store_id
+    expect(client.computeAutomap(["Store ID"]).store_id).toBe("Store ID");
+    expect(client.computeAutomap(["store_id"]).store_id).toBe("store_id");
+    expect(client.computeAutomap(["store-id"]).store_id).toBe("store-id");
+    expect(client.computeAutomap(["StoreID"]).store_id).toBe("StoreID");
+  });
+
+  it("recognizes expanded vocabulary for location_name", () => {
+    expect(client.computeAutomap(["Business Name"]).location_name).toBe("Business Name");
+    expect(client.computeAutomap(["Company"]).location_name).toBe("Company");
+    expect(client.computeAutomap(["DBA"]).location_name).toBe("DBA");
+    expect(client.computeAutomap(["Venue"]).location_name).toBe("Venue");
+    expect(client.computeAutomap(["Place Name"]).location_name).toBe("Place Name");
+  });
+
+  it("recognizes expanded vocabulary for addresses and regions", () => {
+    expect(client.computeAutomap(["Address Line 1"]).street_address).toBe("Address Line 1");
+    expect(client.computeAutomap(["Street 1"]).street_address).toBe("Street 1");
+    expect(client.computeAutomap(["Line 1"]).street_address).toBe("Line 1");
+    expect(client.computeAutomap(["Locality"]).city).toBe("Locality");
+    expect(client.computeAutomap(["Province"]).region).toBe("Province");
+    expect(client.computeAutomap(["State Code"]).region).toBe("State Code");
+  });
+
+  it("recognizes expanded vocabulary for coordinates", () => {
+    expect(client.computeAutomap(["Y"]).latitude).toBe("Y");
+    expect(client.computeAutomap(["X"]).longitude).toBe("X");
+    expect(client.computeAutomap(["Lat_DD"]).latitude).toBe("Lat_DD");
+    expect(client.computeAutomap(["YCoord"]).latitude).toBe("YCoord");
+  });
+
+  it("recognizes expanded vocabulary for country codes", () => {
+    expect(client.computeAutomap(["Country Code"]).iso_country_code).toBe("Country Code");
+    expect(client.computeAutomap(["ISO2"]).iso_country_code).toBe("ISO2");
+    expect(client.computeAutomap(["CC"]).iso_country_code).toBe("CC");
+    expect(client.computeAutomap(["Nation"]).iso_country_code).toBe("Nation");
+  });
+
+  it("recognizes expanded vocabulary for metadata fields", () => {
+    expect(client.computeAutomap(["Mobile"]).phone_number).toBe("Mobile");
+    expect(client.computeAutomap(["Contact Number"]).phone_number).toBe("Contact Number");
+    expect(client.computeAutomap(["Store Number"]).store_id).toBe("Store Number");
+    expect(client.computeAutomap(["Site ID"]).store_id).toBe("Site ID");
+    expect(client.computeAutomap(["Branch ID"]).store_id).toBe("Branch ID");
+    expect(client.computeAutomap(["Domain"]).website).toBe("Domain");
+    expect(client.computeAutomap(["Merchant Category"]).mcc_code).toBe("Merchant Category");
   });
 });
 
