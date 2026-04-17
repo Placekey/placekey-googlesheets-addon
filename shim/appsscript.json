@@ -5,11 +5,11 @@
       {
         "userSymbol": "Placekey",
         "libraryId": "1ybOMCrWb24BaWO6DVuhdJuPNwbkrqMt73nJV0SXgzQ2ssdGFuipAfS7t",
-        "version": "1"
+        "version": "2"
       }
     ]
   },
   "exceptionLogging": "STACKDRIVER",
   "runtimeVersion": "V8",
-  "oauthScopes": ["https://www.googleapis.com/auth/spreadsheets", "https://www.googleapis.com/auth/script.external_request"]
+  "oauthScopes": ["https://www.googleapis.com/auth/spreadsheets", "https://www.googleapis.com/auth/script.external_request", "https://www.googleapis.com/auth/script.container.ui"]
 }
