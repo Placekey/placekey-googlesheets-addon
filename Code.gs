@@ -132,12 +132,12 @@ function refreshUpdateSheet() {
 function insertSample() {
   const ss = SpreadsheetApp.getActiveSheet();
   const sampleData = [
-    ["Name", "Street Address", "City", "State", "Zip code", "Latitude", "Longitude"],
-    ["Twin Peaks Petroleum", "598 Portola Dr", "San Francisco", "CA", "94131", "37.7371", "-122.44283"],
-    ["", "", "", "", "", "37.7371", "-122.44283"],
-    ["Beretta", "1199 Valencia St", "San Francisco", "CA", "94110", "", ""],
-    ["Tasty Hand Pulled Noodle", "1 Doyers St", "New York", "ny", "10013", "", ""],
-    ["", "1 Doyers St", "New York", "NY", "10013", "", ""],
+    ["Name", "Street Address", "City", "State", "Zip code", "Latitude", "Longitude", "Country"],
+    ["Twin Peaks Petroleum", "598 Portola Dr", "San Francisco", "CA", "94131", "37.7371", "-122.44283", "US"],
+    ["", "", "", "", "", "37.7371", "-122.44283", "US"],
+    ["Beretta", "1199 Valencia St", "San Francisco", "CA", "94110", "", "", "US"],
+    ["Tasty Hand Pulled Noodle", "1 Doyers St", "New York", "ny", "10013", "", "", "US"],
+    ["", "1 Doyers St", "New York", "NY", "10013", "", "", "US"],
   ];
   ss.getRange(1, 1, sampleData.length, sampleData[0].length).setValues(sampleData);
   ss.setFrozenRows(1);

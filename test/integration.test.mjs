@@ -63,7 +63,7 @@ describe("full validation pipeline", () => {
 // ==========================================
 describe("sample data acceptance", () => {
   it("all sample data rows validate as expected", () => {
-    const sampleHeaders = ["Name", "Street Address", "City", "State", "Zip code", "Latitude", "Longitude"];
+    const sampleHeaders = ["Name", "Street Address", "City", "State", "Zip code", "Latitude", "Longitude", "Country"];
     const sampleMappings = gs.transformColumnMappings(
       {
         location_name: "Name",
@@ -73,7 +73,7 @@ describe("sample data acceptance", () => {
         postal_code: "Zip code",
         latitude: "Latitude",
         longitude: "Longitude",
-        iso_country_code: NO_INPUT,
+        iso_country_code: "Country",
         store_id: NO_INPUT,
         phone_number: NO_INPUT,
         website: NO_INPUT,
@@ -85,11 +85,11 @@ describe("sample data acceptance", () => {
 
     // Exact sample data from insertSample()
     const sampleRows = [
-      ["Twin Peaks Petroleum", "598 Portola Dr", "San Francisco", "CA", "94131", "37.7371", "-122.44283"],
-      ["", "", "", "", "", "37.7371", "-122.44283"],
-      ["Beretta", "1199 Valencia St", "San Francisco", "CA", "94110", "", ""],
-      ["Tasty Hand Pulled Noodle", "1 Doyers St", "New York", "ny", "10013", "", ""],
-      ["", "1 Doyers St", "New York", "NY", "10013", "", ""],
+      ["Twin Peaks Petroleum", "598 Portola Dr", "San Francisco", "CA", "94131", "37.7371", "-122.44283", "US"],
+      ["", "", "", "", "", "37.7371", "-122.44283", "US"],
+      ["Beretta", "1199 Valencia St", "San Francisco", "CA", "94110", "", "", "US"],
+      ["Tasty Hand Pulled Noodle", "1 Doyers St", "New York", "ny", "10013", "", "", "US"],
+      ["", "1 Doyers St", "New York", "NY", "10013", "", "", "US"],
     ];
 
     const result = gs.validateAllRows(sampleRows, sampleMappings, true);
@@ -101,7 +101,7 @@ describe("sample data acceptance", () => {
     // Verify specific row shapes
     expect(result.validRows[0].location_name).toBe("Twin Peaks Petroleum");
     expect(result.validRows[0].latitude).toBe("37.7371");
-    expect(result.validRows[1].iso_country_code).toBe("US"); // defaulted
+    expect(result.validRows[1].iso_country_code).toBe("US");
     expect(result.validRows[3].region).toBe("ny"); // lowercase preserved
   });
 });
