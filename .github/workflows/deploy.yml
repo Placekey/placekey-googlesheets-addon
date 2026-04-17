@@ -18,9 +18,40 @@ jobs:
       - run: npm run format:check
       - run: npm test
 
-  deploy:
-    name: Deploy to Google Sheets
+  deploy-library:
+    name: Deploy Library
     needs: test
+    runs-on: ubuntu-latest
+    outputs:
+      library_version: ${{ steps.version.outputs.version }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+
+      - run: npm install
+
+      - name: Configure clasp credentials (library)
+        run: |
+          echo '${{ secrets.CLASP_JSON_LIBRARY }}' > .clasp.json
+          echo '${{ secrets.CLASPRC_JSON }}' > ~/.clasprc.json
+
+      - name: Push library code
+        run: npx clasp push --force
+
+      - name: Create library version
+        id: version
+        run: |
+          OUTPUT=$(npx clasp version "${{ github.ref_name }}" 2>&1)
+          echo "$OUTPUT"
+          VERSION=$(echo "$OUTPUT" | grep -oE 'version [0-9]+' | head -1 | awk '{print $2}')
+          echo "version=$VERSION" >> "$GITHUB_OUTPUT"
+
+  deploy-shim:
+    name: Deploy Template Shim
+    needs: deploy-library
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -31,13 +62,20 @@ jobs:
 
       - run: npm install
 
-      - name: Configure clasp credentials
+      - name: Configure clasp credentials (shim)
         run: |
-          echo '${{ secrets.CLASP_JSON }}' > .clasp.json
+          echo '${{ secrets.CLASP_JSON_TEMPLATE }}' > shim/.clasp.json
           echo '${{ secrets.CLASPRC_JSON }}' > ~/.clasprc.json
 
-      - name: Push to Apps Script
-        run: npx clasp push --force
+      - name: Pin shim to new library version
+        run: |
+          cd shim
+          node -e "
+            const fs = require('fs');
+            const manifest = JSON.parse(fs.readFileSync('appsscript.json', 'utf8'));
+            manifest.dependencies.libraries[0].version = '${{ needs.deploy-library.outputs.library_version }}';
+            fs.writeFileSync('appsscript.json', JSON.stringify(manifest, null, 2) + '\n');
+          "
 
-      - name: Create versioned deployment
-        run: npx clasp deploy --description "Release ${{ github.ref_name }}"
+      - name: Push shim to template sheet
+        run: cd shim && npx clasp push --force
