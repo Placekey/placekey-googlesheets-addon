@@ -117,9 +117,14 @@
           <div class="disclosure__content">
             <p class="disclosure__note">Which <a href="https://docs.placekey.io/documentation/placekey-api/response/optional-responses" target="_blank" rel="noopener">optional fields</a> would you like returned?</p>
             <fieldset class="checks">
+              <label class="check check--locked" title="Placekey is always returned">
+                <input type="checkbox" checked disabled aria-label="Placekey is always returned" />
+                <span>Placekey</span>
+                <span class="check__hint">always</span>
+              </label>
+              <label class="check"> <input type="checkbox" name="confidence_score" class="returnFields" checked /> <span>Confidence Level</span> </label>
               <label class="check"> <input type="checkbox" name="address_placekey" class="returnFields" /> <span>Address Placekey</span> </label>
               <label class="check"> <input type="checkbox" name="building_placekey" class="returnFields" /> <span>Building Placekey</span> </label>
-              <label class="check"> <input type="checkbox" name="confidence_score" class="returnFields" /> <span>Confidence Level</span> </label>
               <label class="check"> <input type="checkbox" name="gers" class="returnFields" /> <span>GERS</span> </label>
               <label class="check"> <input type="checkbox" name="geocode" class="returnFields" /> <span>Geocode</span> </label>
               <label class="check"> <input type="checkbox" name="geoid" class="returnFields" /> <span>GeoId</span> </label>
@@ -130,7 +135,7 @@
 
         <label class="check" style="margin-top: 16px"> <input type="checkbox" id="insertError" name="insertError" /> <span>Add error column for invalid rows</span> </label>
 
-        <button id="generate" type="button" onclick="generateKeys()" class="btn-primary mt-10" aria-disabled="true">Generate Placekeys</button>
+        <button id="generate" type="button" onclick="generateKeys()" class="btn-primary mt-10" aria-disabled="true">Generate</button>
 
         <div id="generateToast" class="toast" role="status" aria-live="polite"></div>
       </div>
