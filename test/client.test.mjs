@@ -282,6 +282,34 @@ describe("computeAutomap", () => {
     const result = client.computeAutomap([]);
     expect(result).toEqual({});
   });
+
+  it("learned aliases map custom headers to fields", () => {
+    const learned = { location_n: "location_name", biz_street: "street_address" };
+    const result = client.computeAutomap(["Location_N", "Biz_Street", "City"], learned);
+    expect(result.location_name).toBe("Location_N");
+    expect(result.street_address).toBe("Biz_Street");
+    expect(result.city).toBe("City"); // falls back to built-in
+  });
+
+  it("learned aliases take priority over built-in aliases", () => {
+    // User learned that "Name" should map to store_id (unusual, but user's choice)
+    const learned = { name: "store_id" };
+    const result = client.computeAutomap(["Name"], learned);
+    expect(result.store_id).toBe("Name");
+    expect(result.location_name).toBeUndefined();
+  });
+
+  it("built-in aliases still work when learned aliases is empty", () => {
+    const result = client.computeAutomap(["Name", "City"], {});
+    expect(result.location_name).toBe("Name");
+    expect(result.city).toBe("City");
+  });
+
+  it("learned aliases are case-insensitive on lookup", () => {
+    const learned = { location_n: "location_name" };
+    const result = client.computeAutomap(["LOCATION_N", "  location_n  "], learned);
+    expect(result.location_name).toBe("LOCATION_N");
+  });
 });
 
 // ==========================================

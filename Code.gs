@@ -19,6 +19,7 @@ const API_URL = "https://api.placekey.io/v1/placekeys";
 const USER_AGENT = "placekey-googlesheets/0.0.9";
 const MAX_RETRIES = 3;
 const RATE_LIMIT_MS = 1100;
+const LEARNED_ALIASES_KEY = "learned_aliases";
 
 // ==========================================
 // Triggers
@@ -48,6 +49,27 @@ function setApiKey(key) {
   } else {
     showApiKeyDialog();
   }
+}
+
+// ==========================================
+// Learned Aliases (per-user, cross-sheet)
+// ==========================================
+function getLearnedAliases() {
+  const data = PropertiesService.getUserProperties().getProperty(LEARNED_ALIASES_KEY);
+  try {
+    return JSON.parse(data) || {};
+  } catch (_e) {
+    return {};
+  }
+}
+
+function saveLearnedAliases(columnMappings) {
+  const aliases = getLearnedAliases();
+  for (const [fieldId, columnName] of Object.entries(columnMappings)) {
+    if (columnName === NO_INPUT_STRING || !columnName) continue;
+    aliases[columnName.toLowerCase().trim()] = fieldId;
+  }
+  PropertiesService.getUserProperties().setProperty(LEARNED_ALIASES_KEY, JSON.stringify(aliases));
 }
 
 // ==========================================
@@ -91,7 +113,8 @@ function getActiveSheetInfo() {
   const sheet = SpreadsheetApp.getActiveSheet();
   const cols = sheet.getRange(1, 1, 1, sheet.getLastColumn()).getDisplayValues();
   const mapData = getMapColumnsData(sheet.getSheetId());
-  return { cols, mapData };
+  const learnedAliases = getLearnedAliases();
+  return { cols, mapData, learnedAliases };
 }
 
 function getSheets() {
@@ -102,7 +125,7 @@ function getSheets() {
   try {
     return [active, sheetNames, getActiveSheetInfo()];
   } catch (_e) {
-    return [active, sheetNames, { cols: false, mapData: [] }];
+    return [active, sheetNames, { cols: false, mapData: [], learnedAliases: {} }];
   }
 }
 
@@ -114,7 +137,7 @@ function changeSheet(selectedSheet) {
     const mapData = getMapColumnsData(sheet.getSheetId());
     return { cols, mapData };
   } catch (_e) {
-    return { cols: false, mapData: [] };
+    return { cols: false, mapData: [], learnedAliases: {} };
   }
 }
 
@@ -125,7 +148,7 @@ function refreshUpdateSheet() {
   try {
     return [sheetName, sheetNames, getActiveSheetInfo()];
   } catch (_e) {
-    return [sheetName, sheetNames, { cols: false, mapData: [] }];
+    return [sheetName, sheetNames, { cols: false, mapData: [], learnedAliases: {} }];
   }
 }
 
@@ -142,7 +165,7 @@ function insertSample() {
   ss.getRange(1, 1, sampleData.length, sampleData[0].length).setValues(sampleData);
   ss.setFrozenRows(1);
   showPlaceKeyUI();
-  return { cols: false, mapData: [] };
+  return { cols: false, mapData: [], learnedAliases: {} };
 }
 
 function testUser() {
@@ -438,8 +461,9 @@ function generateKeys(config, uniqueKey) {
     .filter((h) => h.length > 0);
   const totalRows = ss.getLastRow();
 
-  // Save raw column mappings (copy before transforming)
+  // Save raw column mappings (copy before transforming) + learn user-level aliases
   setMapColumnsData(sheetId, { ...columnMappings });
+  saveLearnedAliases(columnMappings);
   const transformed = transformColumnMappings(columnMappings, colsHeader);
 
   // Read all data rows
