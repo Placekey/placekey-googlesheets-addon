@@ -1,14 +1,13 @@
-<!DOCTYPE html>
-<html>
+<!doctype html>
+<html lang="en">
   <head>
     <base target="_top" />
     <?!= include('Stylesheet'); ?>
 
     <script>
-      function insert() {
-        var els = document.getElementById("key").value;
-        console.log(els);
-        google.script.run.withFailureHandler(failHandler).withSuccessHandler(google.script.host.close).setUserProperties(els);
+      function submitApiKey() {
+        const key = document.getElementById("key").value;
+        google.script.run.withFailureHandler(failHandler).withSuccessHandler(google.script.host.close).setApiKey(key);
       }
     </script>
   </head>
@@ -19,13 +18,13 @@
 
       <div class="form__group mt-25">
         <label for="key" class="form__label">API Key</label>
-        <input id="key" type="text" class="form__control" placeholder="Enter your api key here" spellcheck="false" />
+        <input id="key" type="password" class="form__control" placeholder="Enter your API key" spellcheck="false" autocomplete="off" autocorrect="off" autocapitalize="off" onkeydown="if (event.key === 'Enter') submitApiKey();" />
       </div>
 
       <div class="footer mt-25">
         <a class="text-black" href="https://placekey.io/faq" target="_blank" rel="noopener">FAQ</a>
-        <a id="getApi" class="btn ml-15" href="https://dev.placekey.io/default/register" target="_blank" rel="noopener">Get a Free API Key</a>
-        <button id="finish" class="btn-solid ml-15" onclick="insert()">Finish Setup</button>
+        <a id="getApi" class="btn ml-15" href="https://dev.placekey.io/" target="_blank" rel="noopener">Get a Free API Key</a>
+        <button id="finishSetup" class="btn-solid ml-15" onclick="submitApiKey()">Finish Setup</button>
       </div>
     </div>
 
@@ -33,21 +32,22 @@
       <p class="text-red">There was an error with authorization. Please use the addon with your browser default account.</p>
 
       <div class="text-center mt-15">
-        <a id="finish" class="btn-solid" onclick="google.script.host.close()">Close</a>
+        <button id="closeError" class="btn-solid" onclick="google.script.host.close()">Close</button>
       </div>
     </div>
 
     <script>
       google.script.run.withFailureHandler(failHandler).withSuccessHandler(successHandler).testUser();
 
-      document.addEventListener(
-        "DOMContentLoaded",
-        function () {
-          var inputKey = document.getElementById("storedKey").value;
-          document.getElementById("key").value = inputKey;
-        },
-        false
-      );
+      document.addEventListener("DOMContentLoaded", () => {
+        google.script.run
+          .withSuccessHandler((apiKey) => {
+            if (apiKey) {
+              document.getElementById("key").value = apiKey;
+            }
+          })
+          .getApiKey();
+      });
 
       function failHandler() {
         document.getElementById("error").style.display = "block";
@@ -58,4 +58,3 @@
     </script>
   </body>
 </html>
-

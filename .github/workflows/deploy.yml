@@ -1,0 +1,43 @@
+name: Deploy
+
+on:
+  push:
+    tags: ["v*"]
+
+jobs:
+  test:
+    name: Test
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+      - run: npm install
+      - run: npm run lint
+      - run: npm run format:check
+      - run: npm test
+
+  deploy:
+    name: Deploy to Google Sheets
+    needs: test
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+
+      - run: npm install
+
+      - name: Configure clasp credentials
+        run: |
+          echo '${{ secrets.CLASP_JSON }}' > .clasp.json
+          echo '${{ secrets.CLASPRC_JSON }}' > ~/.clasprc.json
+
+      - name: Push to Apps Script
+        run: npx clasp push --force
+
+      - name: Create versioned deployment
+        run: npx clasp deploy --description "Release ${{ github.ref_name }}"

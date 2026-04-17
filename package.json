@@ -1,0 +1,22 @@
+{
+  "name": "placekey-googlesheets-addon",
+  "version": "0.0.9",
+  "private": true,
+  "scripts": {
+    "lint": "eslint '*.gs'",
+    "format:check": "prettier --check '*.gs' '*.html'",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "push": "clasp push",
+    "open": "clasp open",
+    "clasp:login": "clasp login",
+    "clasp:create": "clasp create --type sheets --title 'Placekey Add-on'"
+  },
+  "devDependencies": {
+    "@google/clasp": "^3.3.0",
+    "eslint": "^9.0.0",
+    "happy-dom": "^20.9.0",
+    "prettier": "^3.2.0",
+    "vitest": "^3.0.0"
+  }
+}
