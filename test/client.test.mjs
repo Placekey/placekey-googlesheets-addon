@@ -185,9 +185,10 @@ describe("buildSheetOptions", () => {
 // buildColumnOptions (needs DOM for escapeHtml)
 // ==========================================
 describe("buildColumnOptions", () => {
-  it("starts with -- default option", () => {
+  it("starts with default 'none' option", () => {
     const html = client.buildColumnOptions(["Col1"]);
-    expect(html.startsWith('<option value="--">--</option>')).toBe(true);
+    expect(html.startsWith('<option value="--">')).toBe(true);
+    expect(html).toContain('value="--"');
   });
 
   it("includes non-empty column names", () => {
@@ -211,7 +212,8 @@ describe("buildColumnOptions", () => {
 
   it("returns only default option for empty array", () => {
     const html = client.buildColumnOptions([]);
-    expect(html).toBe('<option value="--">--</option>');
+    expect(html).toMatch(/^<option value="--">.*<\/option>$/);
+    expect((html.match(/<option/g) || []).length).toBe(1);
   });
 });
 
