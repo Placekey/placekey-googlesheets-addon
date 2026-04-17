@@ -1,14 +1,8 @@
-<!DOCTYPE html>
-<html>
+<!doctype html>
+<html lang="en">
   <head>
     <base target="_top" />
     <?!= include('Stylesheet'); ?>
-
-    <script>
-      function insert() {
-        // google.script.run.withSuccessHandler(google.script.host.close).setUserProperties(els);
-      }
-    </script>
   </head>
 
   <body>
@@ -19,8 +13,7 @@
 
       <div id="emptySheet" style="display: none">
         <p><strong>This Sheet looks empty.</strong><br />Fill with sample data?</p>
-
-        <a id="generate" onclick="insertSample()" class="btn-solid w-full mt-20">Fill with sample data</a>
+        <button id="sampleBtn" onclick="insertSample()" class="btn-solid w-full mt-20">Fill with sample data</button>
       </div>
 
       <div id="mapTitle" style="display: none">
@@ -30,29 +23,20 @@
           <label id="labelsheets" for="sheets" class="form__label">Sheets</label>
           <select name="sheets" id="sheets" onChange="changeSheet()" class="form__control">
             <option value="--">--</option>
-            <option value="--">--</option>
           </select>
         </div>
-        <div
-          style="
-            position: absolute;
-
-            right: 22px;
-            top: 22px;
-            height: 20px;
-            cursor: pointer;
-            width: 20px;
-          "
-          onclick="refreshUpdateSheet()"
-        >
-          <img src="https://www.svgrepo.com/show/37313/refresh.svg" />
+        <div style="position: absolute; right: 22px; top: 22px; height: 20px; cursor: pointer; width: 20px" role="button" tabindex="0" aria-label="Refresh sheets" onclick="refreshUpdateSheet()" onkeydown="if (event.key === 'Enter') refreshUpdateSheet();">
+          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <polyline points="23 4 23 10 17 10"></polyline>
+            <polyline points="1 20 1 14 7 14"></polyline>
+            <path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"></path>
+          </svg>
         </div>
         <h2 class="type-h5 mt-20">Match the headers in your document to the fields below.</h2>
 
         <div class="form__group mt-20">
           <label for="location_name" class="form__label"> <strong>Location Name</strong> - e.g. Twin Peaks Petroleum </label>
           <select id="location_name" class="selectCols form__control">
-            <option value="--">--</option>
             <option value="--">--</option>
           </select>
         </div>
@@ -61,14 +45,12 @@
           <label for="street_address" class="form__label"> <strong>Street Address</strong> - e.g. 598 Portola Dr </label>
           <select id="street_address" class="selectCols form__control">
             <option value="--">--</option>
-            <option value="--">--</option>
           </select>
         </div>
 
         <div class="form__group mt-20">
-          <label for="city" class="form__label"> <strong>City</strong> - e.g. San Fransisco </label>
+          <label for="city" class="form__label"> <strong>City</strong> - e.g. San Francisco </label>
           <select id="city" class="selectCols form__control">
-            <option value="--">--</option>
             <option value="--">--</option>
           </select>
         </div>
@@ -77,14 +59,12 @@
           <label for="region" class="form__label"> <strong>Region</strong> - e.g. California or CA </label>
           <select id="region" class="selectCols form__control">
             <option value="--">--</option>
-            <option value="--">--</option>
           </select>
         </div>
 
         <div class="form__group mt-20">
           <label for="postal_code" class="form__label"> <strong>Postal Code</strong> - e.g. 94131 </label>
           <select id="postal_code" class="selectCols form__control">
-            <option value="--">--</option>
             <option value="--">--</option>
           </select>
         </div>
@@ -93,14 +73,12 @@
           <label for="latitude" class="form__label"> <strong>Latitude</strong> - e.g. 37.7371 </label>
           <select id="latitude" class="selectCols form__control">
             <option value="--">--</option>
-            <option value="--">--</option>
           </select>
         </div>
 
         <div class="form__group mt-20">
           <label for="longitude" class="form__label"> <strong>Longitude</strong> - e.g. -122.44283 </label>
           <select id="longitude" class="selectCols form__control">
-            <option value="--">--</option>
             <option value="--">--</option>
           </select>
         </div>
@@ -109,127 +87,99 @@
           <label for="iso_country_code" class="form__label"> <strong>Country</strong> - e.g. US </label>
           <select id="iso_country_code" class="selectCols form__control">
             <option value="--">--</option>
-            <option value="--">--</option>
           </select>
         </div>
 
         <hr class="hr mt-15" />
 
-        <div id="additionalnputs"onclick="toggleAdditionalInputs()" style="display: flex; align-items: center; justify-content: center;">Click to provide additional inputs</div>
-        <div id="metadataInputs"
-        style="display: none;">
-        For more information on additional inputs, click <a href="https://docs.placekey.io/documentation/placekey-api/input-parameters/optional-parameters" target="_blank">here</a>.
-        <div class="form__group mt-20">
-          <label for="phone_number" class="form__label"> <strong>Phone Number</strong> - e.g. 1234567890</label>
-          <select id="phone_number" class="selectCols form__control">US
-            <option value="--">--</option>
-            <option value="--">--</option>
-          </select>
-        </div>
-        <div class="form__group mt-20">
-          <label for="naics_code" class="form__label"> <strong>NAICS Code</strong> - e.g. 712120</label>
-          <select id="naics_code" class="selectCols form__control">US
-            <option value="--">--</option>
-            <option value="--">--</option>
-          </select>
-        </div>
-
-        <div class="form__group mt-20">
-          <label for="website" class="form__label"> <strong>Website</strong> - e.g. sfgsa.org</label>
-          <select id="website" class="selectCols form__control">US
-            <option value="--">--</option>
-            <option value="--">--</option>
-          </select>
-        </div>
-
-        <div class="form__group mt-20">
-          <label for="store_id" class="form__label"> <strong>Store ID</strong> - e.g. 1234</label>
-          <select id="store_id" class="selectCols form__control">US
-            <option value="--">--</option>
-            <option value="--">--</option>
-          </select>
-        </div>
-
-        <div class="form__group mt-20">
-          <label for="mcc_code" class="form__label"> <strong>MCC Code</strong> - e.g. 9399</label>
-          <select id="mcc_code" class="selectCols form__control">US
-            <option value="--">--</option>
-            <option value="--">--</option>
-          </select>
-        </div>
+        <button id="additionalInputs" type="button" onclick="toggleAdditionalInputs()" class="toggle-btn mt-10">Click to provide additional inputs</button>
+        <div id="metadataInputs" style="display: none">
+          For more information on additional inputs, click <a href="https://docs.placekey.io/documentation/placekey-api/input-parameters/optional-parameters" target="_blank">here</a>.
+          <div class="form__group mt-20">
+            <label for="phone_number" class="form__label"> <strong>Phone Number</strong> - e.g. 1234567890</label>
+            <select id="phone_number" class="selectCols form__control">
+              <option value="--">--</option>
+            </select>
+          </div>
+          <div class="form__group mt-20">
+            <label for="naics_code" class="form__label"> <strong>NAICS Code</strong> - e.g. 712120</label>
+            <select id="naics_code" class="selectCols form__control">
+              <option value="--">--</option>
+            </select>
+          </div>
+          <div class="form__group mt-20">
+            <label for="website" class="form__label"> <strong>Website</strong> - e.g. sfgsa.org</label>
+            <select id="website" class="selectCols form__control">
+              <option value="--">--</option>
+            </select>
+          </div>
+          <div class="form__group mt-20">
+            <label for="store_id" class="form__label"> <strong>Store ID</strong> - e.g. 1234</label>
+            <select id="store_id" class="selectCols form__control">
+              <option value="--">--</option>
+            </select>
+          </div>
+          <div class="form__group mt-20">
+            <label for="mcc_code" class="form__label"> <strong>MCC Code</strong> - e.g. 9399</label>
+            <select id="mcc_code" class="selectCols form__control">
+              <option value="--">--</option>
+            </select>
+          </div>
         </div>
         <hr class="hr mt-15" />
 
         <div class="form__group text-12 mt-25" style="padding-bottom: 10px; padding-top: 5px">
-          <!-- disabled checkbox code -->
           Which <a href="https://docs.placekey.io/documentation/placekey-api/response/optional-responses" target="_blank">optional fields</a> would you like to return?
           <div class="flex items-center">
-          <input id="address_placekey" type="checkbox" name="address_placekey" value="address_placekey" class="form__control returnFields" />
-          <label for="address_placekey" class="ml-10">Address Placekey   </label>
+            <input id="address_placekey" type="checkbox" name="address_placekey" value="address_placekey" class="form__control returnFields" />
+            <label for="address_placekey" class="ml-10">Address Placekey</label>
 
-          <input id="building_placekey" type="checkbox" name="building_placekey" value="building_placekey" class="form__control returnFields" />
-          <label for="building_placekey" class="ml-10">Building Placekey</label>
-      
-          
-        </div>
-        <br>
-        <div class="flex items-center" style="padding-bottom: 10px; padding-top: 10px">
-          <input id="confidence_score" type="checkbox" name="confidence_score" value="confidence_score" class="form__control returnFields" />
-          <label for="confidence_score" class="ml-10">Confidence Level</label>
-
-          <input id="gers" type="checkbox" name="gers" value="gers" class="form__control returnFields" />
-          <label for="gers" class="ml-10">GERS</label>
-
-
-          <input id="geocode" type="checkbox" name="geocode" value="geocode" class="form__control returnFields" />
-          <label for="geocode" class="ml-10">Geocode</label>
+            <input id="building_placekey" type="checkbox" name="building_placekey" value="building_placekey" class="form__control returnFields" />
+            <label for="building_placekey" class="ml-10">Building Placekey</label>
           </div>
-
-          <br>
+          <br />
           <div class="flex items-center" style="padding-bottom: 10px; padding-top: 10px">
-          <input id="geoid" type="checkbox" name="geoid" value="geoid" class="form__control returnFields" />
-          <label for="geoid" class="ml-10">GeoId</label>
+            <input id="confidence_score" type="checkbox" name="confidence_score" value="confidence_score" class="form__control returnFields" />
+            <label for="confidence_score" class="ml-10">Confidence Level</label>
 
-          <input id="upi" type="checkbox" name="upi" value="upi" class="form__control returnFields" />
-          <label for="upi" class="ml-10">UPI</label>
+            <input id="gers" type="checkbox" name="gers" value="gers" class="form__control returnFields" />
+            <label for="gers" class="ml-10">GERS</label>
+
+            <input id="geocode" type="checkbox" name="geocode" value="geocode" class="form__control returnFields" />
+            <label for="geocode" class="ml-10">Geocode</label>
           </div>
-        
+          <br />
+          <div class="flex items-center" style="padding-bottom: 10px; padding-top: 10px">
+            <input id="geoid" type="checkbox" name="geoid" value="geoid" class="form__control returnFields" />
+            <label for="geoid" class="ml-10">GeoId</label>
 
-          <!-- <div class="flex items-center mt-5">
-          <input id="nameMatch" type="checkbox" name="nameMatch" value="nameMatch" class="form__control" />
-          <label for="nameMatch" class="ml-10"> Check for exact name matches only</label>
-        </div> -->
-          <hr class="hr mt-15" >
+            <input id="upi" type="checkbox" name="upi" value="upi" class="form__control returnFields" />
+            <label for="upi" class="ml-10">UPI</label>
+          </div>
+
+          <hr class="hr mt-15" />
           <div style="padding-bottom: 10px; padding-top: 10px">Options</div>
           <div class="flex items-center mt-5">
             <input id="insertError" type="checkbox" name="insertError" value="insertError" class="form__control" />
             <label for="insertError" class="ml-10"> Insert errors in new column</label>
           </div>
-
-          <!-- disabled checkbox code -->
-
-          <!-- <div class="flex items-center mt-5">
-          <input id="overwritePlacekey" type="checkbox" name="overwritePlacekey" value="overwritePlacekey" class="form__control" disabled />
-          <label for="overwritePlacekey" class="ml-10">Overwrite existing Placekey column</label>
-        </div> -->
         </div>
 
         <button id="generate" onclick="generateKeys()" class="btn-solid w-full mt-20">Generate Placekeys</button>
 
-        <!--  Point 4  -->
         <div id="generateToast" style="font-style: italic; color: #484852; margin-top: 12px"></div>
       </div>
 
       <footer class="mt-20">
         <div class="flex justify-between">
           <a id="docs" href="https://docs.placekey.io/" target="_blank" class="cursor-pointer text-blue-dodger">View API Docs</a>
-          <a id="changeKey" onclick="google.script.run.changeKey()" class="cursor-pointer text-blue-dodger">Change API Key</a>
+          <button id="changeKey" type="button" onclick="google.script.run.withFailureHandler(failedAPI).changeKey()" class="cursor-pointer text-blue-dodger btn-link">Change API Key</button>
         </div>
 
         <hr class="hr mt-15" />
 
         <a href="https://www.placekey.io/" target="_blank" rel="noopener">
-          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 81 23" width="80" height="25" class="ml-auto mt-20">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 81 23" width="80" height="25" class="ml-auto mt-20" aria-label="Placekey">
             <path d="M78.5 23h-76C1.1 23 0 21.9 0 20.5v-18C0 1.1 1.1 0 2.5 0h76C79.9 0 81 1.1 81 2.5v18c0 1.4-1.1 2.5-2.5 2.5z" />
             <path
               d="M70.3 8.5l2.2 4.3 1.9-4.3H77l-5.6 11h-2.5l2.4-4.6-3.5-6.4h2.5zm-61.6-5c2.6 0 4.7 2.1 4.7 4.7s-4.3 8.5-4.7 8.5S4 10.8 4 8.2s2.1-4.7 4.7-4.7zm24.4 4.8c.5 0 1 .1 1.5.3.4.2.8.5 1.1.8v-.9h2.2v7.3h-2.2v-1c-.3.4-.7.7-1.1.9-.4.2-.9.3-1.4.3-.7 0-1.3-.2-1.8-.5s-1-.8-1.3-1.4c-.3-.6-.5-1.3-.5-2s.2-1.4.5-2c.3-.6.7-1 1.3-1.4.4-.2 1-.4 1.7-.4zm9.5 0c.5 0 .9.1 1.4.2s.8.3 1 .5l-.7 1.5c-.4-.3-.8-.4-1.3-.4s-.8.1-1.1.3c-.3.2-.6.5-.7.8-.2.3-.2.7-.2 1 0 .4.1.7.3 1.1.2.3.4.6.7.8.3.2.7.3 1.1.3.3 0 .5 0 .7-.1l.6-.3.7 1.5c-.3.2-.6.4-1 .5h-1.5c-.6 0-1.1-.1-1.6-.3s-.9-.5-1.3-.8c-.4-.4-.7-.8-.9-1.2-.2-.5-.3-1-.3-1.5s.1-1 .3-1.5c.2-.5.5-.9.9-1.2s.8-.6 1.3-.9 1.1-.3 1.6-.3zm6.4 0c.8 0 1.4.2 2 .5s1 .8 1.3 1.3c.3.6.5 1.2.5 2v.5h-5.6c0 .4.1.7.3 1 .2.3.4.5.7.6.3.2.7.2 1.1.2.4 0 .7-.1 1-.2.3-.1.6-.4.8-.7l1.6.8c-.3.6-.8 1.1-1.5 1.4-.6.3-1.3.5-2.1.5s-1.5-.2-2.1-.5c-.6-.3-1.1-.8-1.5-1.4-.4-.6-.5-1.2-.5-2 0-.5.1-1 .3-1.5.2-.5.5-.9.9-1.2.4-.4.8-.6 1.3-.8.4-.4.9-.5 1.5-.5zm15.7 0c.8 0 1.4.2 2 .5s1 .8 1.3 1.3c.3.6.5 1.2.5 2v.5h-5.6c0 .4.1.7.3 1 .2.3.4.5.7.6.3.2.7.2 1.1.2.4 0 .7-.1 1-.2.3-.1.6-.4.8-.7l1.6.8c-.3.6-.8 1.1-1.5 1.4-.6.3-1.3.5-2.1.5s-1.5-.2-2.1-.5c-.6-.3-1.1-.8-1.5-1.4-.4-.6-.5-1.2-.5-2 0-.5.1-1 .3-1.5.2-.5.5-.9.9-1.2.4-.4.8-.6 1.3-.8.4-.4.9-.5 1.5-.5zM21.9 4.1c.8 0 1.4.1 2 .4.6.3 1.1.7 1.4 1.2s.5 1.2.5 2-.2 1.4-.5 2c-.3.6-.8 1-1.4 1.3-.6.3-1.3.4-2 .4h-1.7v4.5h-2.3V4.1h4zm6.8-.1v11.9h-2.2V4h2.2zm27.1 0v7.2l2.7-2.7h2.8l-3.6 3.6 3.7 3.7h-2.8l-2.9-2.9v2.9h-2.2V4h2.3zm-22 6.2c-.4 0-.7.1-1 .3-.3.2-.5.4-.7.7s-.3.7-.3 1 .1.7.3 1c.2.3.4.5.7.7.3.2.6.3 1 .3s.7-.1 1-.3c.3-.2.5-.4.7-.7.2-.3.2-.7.2-1 0-.4-.1-.7-.3-1s-.4-.5-.7-.7c-.2-.3-.6-.3-.9-.3zM8.7 6.3c-1 0-1.9.9-1.9 1.9 0 .7.4 1.3 1 1.7h.1L7.8 11v.1c0 .5.4.9.9.9h.1c.5 0 .8-.4.8-.9V10c.6-.3 1.1-1 1.1-1.7-.1-1.1-.9-2-2-2zM49 9.9c-.3 0-.6.1-.8.2-.2.1-.4.3-.6.5s-.2.4-.3.7h3.4c0-.3-.1-.5-.3-.7-.2-.2-.4-.4-.6-.5-.2-.2-.5-.2-.8-.2zm15.7 0c-.3 0-.6.1-.8.2-.2.1-.4.3-.6.5s-.3.4-.3.6h3.4c0-.3-.1-.5-.3-.7-.2-.2-.4-.4-.6-.5s-.5-.1-.8-.1zm-43.5-4h-1v3.6h1c.4 0 .8-.1 1.1-.2.3-.1.6-.3.8-.6s.3-.6.3-1-.1-.8-.3-1c-.2-.3-.5-.4-.8-.6-.3-.1-.7-.2-1.1-.2z"
@@ -241,194 +191,193 @@
     </main>
 
     <script>
-      document.addEventListener(
-        "DOMContentLoaded",
-        function () {
-          google.script.run.withSuccessHandler(getSheetsToast).getSheets();
-          // var inputKey = document.getElementById("storedKey").value;
-          // document.getElementById("key").value = inputKey;
-        },
-        false
-      );
-
-      document.getElementById
-
-      function toggleAdditionalInputs(e){
-        document.getElementById("metadataInputs").style.display = document.getElementById("metadataInputs").style.display==="none" ? "block": "none";
-
-        document.getElementById("additionalnputs").innerHTML = document.getElementById("metadataInputs").style.display==="none" ? "Click Here to Provide Additional Inputs": "Close";
+      // ==========================================
+      // Helpers
+      // ==========================================
+      function escapeHtml(str) {
+        const div = document.createElement("div");
+        div.appendChild(document.createTextNode(str));
+        return div.innerHTML;
       }
 
-      function getSheetsToast(e) {
-        console.log(e);
-        document.getElementById("stillWorking").style.display = "none";
-        var select = document.getElementById("sheets");
-        var appendSelect = "";
-        for (var i = 0; i < e[1].length; i++) {
-          if (e[1][i] == e[0]) {
-            appendSelect += '<option value="' + e[1][i] + '" selected>' + e[1][i] + "</option>";
-          } else {
-            appendSelect += '<option value="' + e[1][i] + '">' + e[1][i] + "</option>";
+      function buildSheetOptions(sheetNames, activeSheet) {
+        return sheetNames
+          .map((name) => {
+            const escaped = escapeHtml(name);
+            const selected = name === activeSheet ? " selected" : "";
+            return `<option value="${escaped}"${selected}>${escaped}</option>`;
+          })
+          .join("");
+      }
+
+      function buildColumnOptions(cols) {
+        let html = '<option value="--">--</option>';
+        for (const col of cols) {
+          if (col !== "") {
+            const escaped = escapeHtml(col);
+            html += `<option value="${escaped}">${escaped}</option>`;
           }
         }
-        select.innerHTML = appendSelect;
-        changeSheetToast(e[2]);
-        // google.script.run.withSuccessHandler(google.script.host.close).setUserProperties(els);
+        return html;
+      }
+
+      // ==========================================
+      // Initialization
+      // ==========================================
+      document.addEventListener("DOMContentLoaded", () => {
+        google.script.run.withSuccessHandler(handleSheetData).getSheets();
+      });
+
+      function toggleAdditionalInputs() {
+        const panel = document.getElementById("metadataInputs");
+        const btn = document.getElementById("additionalInputs");
+        const isHidden = panel.style.display === "none";
+        panel.style.display = isHidden ? "block" : "none";
+        btn.textContent = isHidden ? "Close" : "Click to provide additional inputs";
+      }
+
+      // ==========================================
+      // Sheet Data Handlers
+      // ==========================================
+      function handleSheetData(e) {
+        document.getElementById("stillWorking").style.display = "none";
+        document.getElementById("sheets").innerHTML = buildSheetOptions(e[1], e[0]);
+        updateColumns(e[2]);
       }
 
       function changeSheet() {
-        // document.getElementById("overwritePlacekey").disabled = true;
-        // document.getElementById("overwritePlacekey").checked = false;
-        var selectedSheet = document.getElementById("sheets").value;
-        google.script.run.withSuccessHandler(changeSheetToast).changeSheet(selectedSheet);
+        const selectedSheet = document.getElementById("sheets").value;
+        google.script.run.withSuccessHandler(updateColumns).changeSheet(selectedSheet);
       }
 
-      function changeSheetToast({ cols: e, mapData: v } = { cols: false, mapData: [] }) {
-        if (!v) v = [];
-        if (e == false) {
+      function updateColumns({ cols, mapData } = { cols: false, mapData: [] }) {
+        if (!mapData) mapData = [];
+        if (!cols) {
           document.getElementById("emptySheet").style.display = "block";
           document.getElementById("mapTitle").style.display = "none";
         } else {
           document.getElementById("mapTitle").style.display = "block";
           document.getElementById("emptySheet").style.display = "none";
-          var columnsToAppend = '<option value="--">--</option>';
-          for (var i = 0; i < e[0].length; i++) {
-            if (e[0][i] != "") {
-              columnsToAppend += ' <option value="' + e[0][i] + '">' + e[0][i] + "</option>";
-              if (e[0][i] == "Placekey") {
-                /**
-                 * Disabled checkbox
-                 **/
-                // document.getElementById("overwritePlacekey").disabled = false;
-                // document.getElementById("overwritePlacekey").checked = true;
-              }
+          const columnsHtml = buildColumnOptions(cols[0]);
+          const selectCols = document.getElementsByClassName("selectCols");
+          for (let j = 0; j < selectCols.length; j++) {
+            selectCols[j].innerHTML = columnsHtml;
+            // Restore saved mapping by element ID (mapData is keyed by field name)
+            const savedValue = mapData && mapData[selectCols[j].id];
+            if (savedValue) {
+              selectCols[j].value = savedValue;
             }
           }
-          var selectCols = document.getElementsByClassName("selectCols");
-          for (var j = 0; j < selectCols.length; j++) {
-            selectCols[j].innerHTML = columnsToAppend;
-            if (v[j]) selectCols[j].value = v[j] ?? "--";
+          if (cols[0].includes("Placekey")) {
+            // Placekey column already exists
           }
         }
       }
 
-      function minimumInputProvided(columnMappings){
-        let mappedColumns = Object.keys(columnMappings).filter( key => columnMappings[key] != "--")
-
-        const minimumInputs = [["latitude", "longitude"], ["street_address", "city", "region", "postal_code", "iso_country_code"], ["street_address", "region", "postal_code", "iso_country_code"],["street_address", "city", "region", "iso_country_code"]]
-
-        for(let inputs of minimumInputs){
-           let hasRequiredInputs = true
-        for(let key of inputs){
-          if(!mappedColumns.includes(key)){
-            hasRequiredInputs = false
-            break
-          }
-        }
-         if(hasRequiredInputs){
-          return true
-        }
+      // ==========================================
+      // Input Validation
+      // ==========================================
+      function minimumInputProvided(columnMappings) {
+        const mapped = Object.keys(columnMappings).filter((key) => columnMappings[key] !== "--");
+        const minimumInputs = [
+          ["latitude", "longitude"],
+          ["street_address", "city", "region", "postal_code", "iso_country_code"],
+          ["street_address", "region", "postal_code", "iso_country_code"],
+          ["street_address", "city", "region", "iso_country_code"],
+        ];
+        return minimumInputs.some((inputs) => inputs.every((key) => mapped.includes(key)));
       }
-      return false
-        }
 
+      function hasDuplicateMappings(columnMappings) {
+        const mapped = Object.values(columnMappings).filter((v) => v !== "--");
+        return new Set(mapped).size !== mapped.length;
+      }
 
+      // ==========================================
+      // Generate Placekeys
+      // ==========================================
       let statusInterval;
 
       function generateKeys() {
-        document.getElementById("generate").disabled = true;
-        var selectCols = document.getElementsByClassName("selectCols");
-        var returnFieldInputs = document.getElementsByClassName("returnFields")
+        const generateBtn = document.getElementById("generate");
+        const toast = document.getElementById("generateToast");
+        generateBtn.disabled = true;
 
-        var requestFields = []
-        for(let input of returnFieldInputs){
-          if(input.checked){
-            requestFields.push(input.name)
-          }
+        // Collect return fields
+        const returnFieldInputs = document.getElementsByClassName("returnFields");
+        const requestFields = [];
+        for (const input of returnFieldInputs) {
+          if (input.checked) requestFields.push(input.name);
         }
 
-        var address = [];
-        const columnMappings = {}
-        for (var j = 0; j < selectCols.length; j++) {
-          columnMappings[selectCols[j].id] = selectCols[j].value
+        // Collect column mappings
+        const selectCols = document.getElementsByClassName("selectCols");
+        const columnMappings = {};
+        for (let j = 0; j < selectCols.length; j++) {
+          columnMappings[selectCols[j].id] = selectCols[j].value;
         }
 
-        //verify user has provided minimum input data
+        // Validate minimum inputs
         if (!minimumInputProvided(columnMappings)) {
-          google.script.run.Alert("Please provide minimum inputs required for API.");
-          // document.getElementById("didNotSelected").style.display = 'block';
-          document.getElementById("generate").disabled = false;
-          document.getElementById("generateToast").innerHTML =  `Please provide minimum inputs required for API. Can be found <a href='https://docs.placekey.io/documentation/placekey-api/input-parameters/minimum-inputs'  target="_blank">here</a>.`;
+          generateBtn.disabled = false;
+          toast.innerHTML = `Please provide minimum inputs required for API. Can be found <a href="https://docs.placekey.io/documentation/placekey-api/input-parameters/minimum-inputs" target="_blank">here</a>.`;
           return false;
         }
 
-        //verify each column is only mapped to one field
-        for(let col of Object.values(columnMappings)){
-          if(col==="--"){
-            continue
-          }
-          const valueList = Object.values(columnMappings)
-          let index = valueList.indexOf(col)
-          if(valueList.indexOf(col, index+1)!=-1){
-            google.script.run.Alert("The same column is mapped to more than one field. Please map only one column per field.");
-              document.getElementById("generate").disabled = false;
-              return false;
-          }
+        // Check for duplicate column mappings
+        if (hasDuplicateMappings(columnMappings)) {
+          generateBtn.disabled = false;
+          toast.textContent = "The same column is mapped to more than one field. Please map only one column per field.";
+          return false;
         }
 
-        document.getElementById("generateToast").innerHTML = "Working...";
-        setTimeout(function () {
-          document.getElementById("generateToast").innerHTML = "Please wait...";
+        toast.textContent = "Working...";
+        setTimeout(() => {
+          toast.textContent = "Please wait...";
         }, 1000);
-        
-        let configOptions = {
-          addressMatch: false,
-          nameMatch: false,
-          overwrite: true,
-          insertError: document.getElementById("insertError").checked,
-        }
 
         const config = {
-          columnMappings: columnMappings,
-          requestFields: requestFields,
-          options: configOptions
-        }
+          columnMappings,
+          requestFields,
+          options: {
+            addressMatch: false,
+            nameMatch: false,
+            overwrite: true,
+            insertError: document.getElementById("insertError").checked,
+          },
+        };
 
-        window.key = crypto.randomUUID() + "." + new Date().getTime();
+        window.key = crypto.randomUUID() + "." + Date.now();
 
-        google.script.run.withFailureHandler(failedAPI).withSuccessHandler(generateKeysToast).generateKeys(config, key);
+        google.script.run.withFailureHandler(failedAPI).withSuccessHandler(generateKeysToast).generateKeys(config, window.key);
 
-        if (statusInterval) {
-          clearInterval(statusInterval);
-        }
+        if (statusInterval) clearInterval(statusInterval);
 
-        // every 2s later show status
         statusInterval = setInterval(() => {
           google.script.run
             .withFailureHandler((err) => console.log("status", err))
             .withSuccessHandler(showCurrentStatus)
-            .getStatus(key);
+            .getStatus(window.key);
         }, 2000);
       }
 
+      // ==========================================
+      // Status & Result Handlers
+      // ==========================================
       function showCurrentStatus(e) {
         const status = e ?? "Loading...";
-        
-        if (key == window.key && status) {
-          document.getElementById("generateToast").innerHTML =  status;
-           if (status.indexOf("Done!")!==-1) {
-              clearInterval(statusInterval);
-              window.key = null;
+        if (window.key && status) {
+          document.getElementById("generateToast").textContent = status;
+          if (status.indexOf("Done!") !== -1) {
+            clearInterval(statusInterval);
+            window.key = null;
           }
         }
       }
 
       function failedAPI(e) {
-        document.getElementById("generateToast").innerHTML = e.message;
-
-
+        document.getElementById("generateToast").textContent = e.message;
         document.getElementById("generate").disabled = false;
-
         if (statusInterval) {
           clearInterval(statusInterval);
           window.key = null;
@@ -436,53 +385,38 @@
       }
 
       function generateKeysToast(e) {
-        // document.getElementById("overwritePlacekey").disabled = false;
-        // document.getElementById("overwritePlacekey").checked = true;
-        document.getElementById("generateToast").innerHTML = "Done! Generated " + e + " Placekeys.";
-        setTimeout(function () {
-          document.getElementById("generateToast").innerHTML = "";
-        }, 5000);
+        document.getElementById("generateToast").textContent = `Done! Generated ${e} Placekeys.`;
         document.getElementById("generate").disabled = false;
-
         if (statusInterval) {
           clearInterval(statusInterval);
           window.key = null;
         }
       }
 
+      // ==========================================
+      // Other Actions
+      // ==========================================
       function insertSample() {
-        google.script.run.withSuccessHandler(changeSheetToast).insertSample();
+        google.script.run.withSuccessHandler(updateColumns).insertSample();
       }
 
       function refreshUpdateSheet() {
-        console.log("refreshing");
-        google.script.run.withSuccessHandler(refreshUpdateSheetToast).refreshUpdateSheet();
-        var select = document.getElementById("sheets");
+        const select = document.getElementById("sheets");
         document.getElementById("labelsheets").style.display = "none";
         select.disabled = true;
         select.style.background = "#dedede";
         select.style.color = "#9a9a9a";
+        google.script.run.withSuccessHandler(handleRefreshData).refreshUpdateSheet();
       }
 
-      function refreshUpdateSheetToast(e) {
-        var select = document.getElementById("sheets");
+      function handleRefreshData(e) {
+        const select = document.getElementById("sheets");
         document.getElementById("labelsheets").style.display = "block";
         select.disabled = false;
         select.style.background = "";
         select.style.color = "";
-
-        var select = document.getElementById("sheets");
-        var appendSelect = "";
-        for (var i = 0; i < e[1].length; i++) {
-          if (e[1][i] == e[0]) {
-            appendSelect += '<option value="' + e[1][i] + '" selected>' + e[1][i] + "</option>";
-          } else {
-            appendSelect += '<option value="' + e[1][i] + '">' + e[1][i] + "</option>";
-          }
-        }
-        select.innerHTML = appendSelect;
-
-        changeSheetToast(e[2]);
+        select.innerHTML = buildSheetOptions(e[1], e[0]);
+        updateColumns(e[2]);
       }
     </script>
   </body>
