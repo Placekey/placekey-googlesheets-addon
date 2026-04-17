@@ -1,0 +1,270 @@
+// @vitest-environment happy-dom
+import { describe, it, expect, beforeAll } from "vitest";
+import { loadClientFunctions } from "./client-helpers.mjs";
+
+let client;
+
+beforeAll(() => {
+  // Pass real DOM globals from happy-dom environment
+  client = loadClientFunctions({ document });
+});
+
+// ==========================================
+// minimumInputProvided (pure logic, no DOM)
+// ==========================================
+describe("minimumInputProvided", () => {
+  it("returns true for lat+long", () => {
+    expect(client.minimumInputProvided({ latitude: "Lat", longitude: "Lng", city: "--", region: "--", street_address: "--", postal_code: "--", iso_country_code: "--" })).toBe(true);
+  });
+
+  it("returns true for street+city+region+postal+country", () => {
+    expect(
+      client.minimumInputProvided({
+        latitude: "--",
+        longitude: "--",
+        street_address: "Street",
+        city: "City",
+        region: "State",
+        postal_code: "Zip",
+        iso_country_code: "Country",
+      }),
+    ).toBe(true);
+  });
+
+  it("returns true for street+region+postal+country (no city)", () => {
+    expect(
+      client.minimumInputProvided({
+        latitude: "--",
+        longitude: "--",
+        street_address: "Street",
+        city: "--",
+        region: "State",
+        postal_code: "Zip",
+        iso_country_code: "Country",
+      }),
+    ).toBe(true);
+  });
+
+  it("returns true for street+city+region+country (no postal)", () => {
+    expect(
+      client.minimumInputProvided({
+        latitude: "--",
+        longitude: "--",
+        street_address: "Street",
+        city: "City",
+        region: "State",
+        postal_code: "--",
+        iso_country_code: "Country",
+      }),
+    ).toBe(true);
+  });
+
+  it("returns false when nothing mapped", () => {
+    expect(
+      client.minimumInputProvided({
+        latitude: "--",
+        longitude: "--",
+        street_address: "--",
+        city: "--",
+        region: "--",
+        postal_code: "--",
+        iso_country_code: "--",
+      }),
+    ).toBe(false);
+  });
+
+  it("returns false for only latitude (no longitude)", () => {
+    expect(client.minimumInputProvided({ latitude: "Lat", longitude: "--", street_address: "--", city: "--", region: "--", postal_code: "--", iso_country_code: "--" })).toBe(false);
+  });
+
+  it("returns false for street+city only (insufficient)", () => {
+    expect(
+      client.minimumInputProvided({
+        latitude: "--",
+        longitude: "--",
+        street_address: "Street",
+        city: "City",
+        region: "--",
+        postal_code: "--",
+        iso_country_code: "--",
+      }),
+    ).toBe(false);
+  });
+});
+
+// ==========================================
+// hasDuplicateMappings (pure logic, no DOM)
+// ==========================================
+describe("hasDuplicateMappings", () => {
+  it("returns false when no duplicates", () => {
+    expect(client.hasDuplicateMappings({ a: "Col1", b: "Col2", c: "--" })).toBe(false);
+  });
+
+  it("returns true when two fields map to same column", () => {
+    expect(client.hasDuplicateMappings({ a: "Col1", b: "Col1", c: "--" })).toBe(true);
+  });
+
+  it("returns false when all unmapped (-- values filtered out)", () => {
+    expect(client.hasDuplicateMappings({ a: "--", b: "--", c: "--" })).toBe(false);
+  });
+
+  it("returns false for single mapped field", () => {
+    expect(client.hasDuplicateMappings({ a: "Col1", b: "--" })).toBe(false);
+  });
+
+  it("detects duplicates among many fields", () => {
+    expect(client.hasDuplicateMappings({ a: "A", b: "B", c: "C", d: "B", e: "--" })).toBe(true);
+  });
+});
+
+// ==========================================
+// escapeHtml (needs DOM)
+// ==========================================
+describe("escapeHtml", () => {
+  it("returns normal strings unchanged", () => {
+    expect(client.escapeHtml("Hello World")).toBe("Hello World");
+  });
+
+  it("escapes < and > (prevents tag injection)", () => {
+    const result = client.escapeHtml("<script>alert('xss')</script>");
+    expect(result).not.toContain("<script>");
+    expect(result).toContain("&lt;script&gt;");
+  });
+
+  it("escapes &", () => {
+    expect(client.escapeHtml("A & B")).toContain("&amp;");
+  });
+
+  it("does not escape double quotes (safe in text nodes, not attributes)", () => {
+    const result = client.escapeHtml('value="injected"');
+    // createTextNode does not escape " — quotes are only special in attribute context
+    // The escapeHtml function is used for option text/values, which are safe
+    expect(result).toContain('"');
+  });
+
+  it("handles empty string", () => {
+    expect(client.escapeHtml("")).toBe("");
+  });
+
+  it("handles string with only special characters", () => {
+    const result = client.escapeHtml('<>&"');
+    expect(result).not.toContain("<");
+    expect(result).not.toContain(">");
+  });
+});
+
+// ==========================================
+// buildSheetOptions (needs DOM for escapeHtml)
+// ==========================================
+describe("buildSheetOptions", () => {
+  it("marks active sheet as selected", () => {
+    const html = client.buildSheetOptions(["Sheet1", "Sheet2"], "Sheet1");
+    expect(html).toContain('value="Sheet1" selected');
+    expect(html).not.toContain('value="Sheet2" selected');
+  });
+
+  it("produces option tags for all sheets", () => {
+    const html = client.buildSheetOptions(["A", "B", "C"], "B");
+    expect(html).toContain("A</option>");
+    expect(html).toContain("B</option>");
+    expect(html).toContain("C</option>");
+  });
+
+  it("escapes HTML in sheet names", () => {
+    const html = client.buildSheetOptions(["<img src=x onerror=alert(1)>"], "other");
+    expect(html).not.toContain("<img");
+    expect(html).toContain("&lt;img");
+  });
+
+  it("returns empty string for empty array", () => {
+    expect(client.buildSheetOptions([], "Sheet1")).toBe("");
+  });
+});
+
+// ==========================================
+// buildColumnOptions (needs DOM for escapeHtml)
+// ==========================================
+describe("buildColumnOptions", () => {
+  it("starts with -- default option", () => {
+    const html = client.buildColumnOptions(["Col1"]);
+    expect(html.startsWith('<option value="--">--</option>')).toBe(true);
+  });
+
+  it("includes non-empty column names", () => {
+    const html = client.buildColumnOptions(["Name", "Street", "City"]);
+    expect(html).toContain("Name</option>");
+    expect(html).toContain("Street</option>");
+    expect(html).toContain("City</option>");
+  });
+
+  it("skips empty strings", () => {
+    const html = client.buildColumnOptions(["Name", "", "City"]);
+    const optionCount = (html.match(/<option/g) || []).length;
+    expect(optionCount).toBe(3); // -- + Name + City (empty skipped)
+  });
+
+  it("escapes HTML in column names", () => {
+    const html = client.buildColumnOptions(["<script>evil</script>"]);
+    expect(html).not.toContain("<script>");
+    expect(html).toContain("&lt;script&gt;");
+  });
+
+  it("returns only default option for empty array", () => {
+    const html = client.buildColumnOptions([]);
+    expect(html).toBe('<option value="--">--</option>');
+  });
+});
+
+// ==========================================
+// Client-server validation consistency
+// ==========================================
+describe("client-server validation consistency", () => {
+  let gs;
+  const HEADERS = ["Name", "Street", "City", "State", "Zip", "Lat", "Lng", "Country"];
+  const allUnmapped = {
+    location_name: "--",
+    street_address: "--",
+    city: "--",
+    region: "--",
+    postal_code: "--",
+    latitude: "--",
+    longitude: "--",
+    iso_country_code: "--",
+    store_id: "--",
+    phone_number: "--",
+    website: "--",
+    naics_code: "--",
+    mcc_code: "--",
+  };
+
+  beforeAll(async () => {
+    const { loadCodeGS } = await import("./helpers.mjs");
+    gs = loadCodeGS();
+  });
+
+  // Test each known minimum input set: client and server should agree
+  const minimumSets = [
+    { name: "lat+long", fields: { latitude: "Lat", longitude: "Lng" }, row: ["", "", "", "", "", "37.7", "-122.4", ""] },
+    { name: "street+city+region+postal+country", fields: { street_address: "Street", city: "City", region: "State", postal_code: "Zip", iso_country_code: "Country" }, row: ["", "123 Main", "NYC", "NY", "10001", "", "", "US"] },
+    { name: "street+region+postal+country", fields: { street_address: "Street", region: "State", postal_code: "Zip", iso_country_code: "Country" }, row: ["", "123 Main", "", "NY", "10001", "", "", "US"] },
+    { name: "street+city+region+country", fields: { street_address: "Street", city: "City", region: "State", iso_country_code: "Country" }, row: ["", "123 Main", "NYC", "NY", "", "", "", "US"] },
+  ];
+
+  for (const { name, fields, row } of minimumSets) {
+    it(`client and server both accept: ${name}`, () => {
+      const clientMappings = { ...allUnmapped, ...fields };
+      expect(client.minimumInputProvided(clientMappings)).toBe(true);
+
+      const serverMappings = gs.transformColumnMappings(clientMappings, HEADERS);
+      expect(gs.isValidRow(row, serverMappings).isValid).toBe(true);
+    });
+  }
+
+  it("client and server both reject: name only", () => {
+    const clientMappings = { ...allUnmapped, location_name: "Name" };
+    expect(client.minimumInputProvided(clientMappings)).toBe(false);
+
+    const serverMappings = gs.transformColumnMappings(clientMappings, HEADERS);
+    expect(gs.isValidRow(["Shop", "", "", "", "", "", "", ""], serverMappings).isValid).toBe(false);
+  });
+});
