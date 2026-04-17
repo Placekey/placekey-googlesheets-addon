@@ -1,0 +1,28 @@
+{
+  "version": "0.2",
+  "language": "en",
+  "words": [
+    "automap",
+    "clasp",
+    "clasprc",
+    "cooldown",
+    "eqeqeq",
+    "esbenp",
+    "geocode",
+    "googleapis",
+    "kernelsam",
+    "arawinters",
+    "placekey",
+    "placekeys",
+    "senzing",
+    "shellcheck",
+    "vitest",
+    "zizmor"
+  ],
+  "ignorePaths": [
+    ".git/**",
+    ".claude/**",
+    "node_modules/**",
+    "package-lock.json"
+  ]
+}
