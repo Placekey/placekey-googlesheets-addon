@@ -3,6 +3,7 @@
 Placekey is a free, universal standard identifier for any physical place. This Google Sheets Add-on makes it easy to generate Placekeys for your address or POI data.
 
 ## Full Documentation
+
 https://docs.placekey.io/
 
 ## Installation
@@ -66,4 +67,5 @@ Tagged releases (`git tag v0.X.Y && git push --tags`) trigger GitHub Actions to 
 Pull requests are welcome. For major changes, please open an issue first to discuss what you would like to change.
 
 ## License
+
 [Apache-2.0 License](https://github.com/Placekey/placekey-googlesheets-addon/blob/master/LICENSE)
