@@ -221,6 +221,87 @@
         return html;
       }
 
+      // Header text (lowercased + trimmed) → field id
+      const AUTO_MAP_ALIASES = {
+        name: "location_name",
+        "location name": "location_name",
+        location_name: "location_name",
+        "business name": "location_name",
+        business: "location_name",
+        company: "location_name",
+
+        "street address": "street_address",
+        street_address: "street_address",
+        address: "street_address",
+        street: "street_address",
+        addr: "street_address",
+
+        city: "city",
+        town: "city",
+        municipality: "city",
+
+        state: "region",
+        region: "region",
+        province: "region",
+
+        zip: "postal_code",
+        zipcode: "postal_code",
+        "zip code": "postal_code",
+        "postal code": "postal_code",
+        postal_code: "postal_code",
+        postcode: "postal_code",
+
+        latitude: "latitude",
+        lat: "latitude",
+
+        longitude: "longitude",
+        lng: "longitude",
+        long: "longitude",
+        lon: "longitude",
+
+        country: "iso_country_code",
+        "iso country code": "iso_country_code",
+        iso_country_code: "iso_country_code",
+        nation: "iso_country_code",
+
+        phone: "phone_number",
+        "phone number": "phone_number",
+        phone_number: "phone_number",
+        tel: "phone_number",
+        telephone: "phone_number",
+
+        naics: "naics_code",
+        "naics code": "naics_code",
+        naics_code: "naics_code",
+
+        website: "website",
+        url: "website",
+        web: "website",
+        homepage: "website",
+
+        "store id": "store_id",
+        store_id: "store_id",
+        "location id": "store_id",
+        location_id: "store_id",
+
+        mcc: "mcc_code",
+        "mcc code": "mcc_code",
+        mcc_code: "mcc_code",
+      };
+
+      function computeAutomap(headers) {
+        const automap = {};
+        for (const header of headers) {
+          if (!header) continue;
+          const fieldId = AUTO_MAP_ALIASES[header.toLowerCase().trim()];
+          // First matching header wins if multiple map to the same field
+          if (fieldId && !automap[fieldId]) {
+            automap[fieldId] = header;
+          }
+        }
+        return automap;
+      }
+
       // ==========================================
       // Initialization
       // ==========================================
@@ -251,26 +332,28 @@
       }
 
       function updateColumns({ cols, mapData } = { cols: false, mapData: [] }) {
-        if (!mapData) mapData = [];
+        if (!mapData) mapData = {};
         if (!cols) {
           document.getElementById("emptySheet").style.display = "block";
           document.getElementById("mapTitle").style.display = "none";
-        } else {
-          document.getElementById("mapTitle").style.display = "block";
-          document.getElementById("emptySheet").style.display = "none";
-          const columnsHtml = buildColumnOptions(cols[0]);
-          const selectCols = document.getElementsByClassName("selectCols");
-          for (let j = 0; j < selectCols.length; j++) {
-            selectCols[j].innerHTML = columnsHtml;
-            // Restore saved mapping by element ID (mapData is keyed by field name)
-            const savedValue = mapData && mapData[selectCols[j].id];
-            if (savedValue) {
-              selectCols[j].value = savedValue;
-            }
-          }
-          if (cols[0].includes("Placekey")) {
-            // Placekey column already exists
-          }
+          return;
+        }
+        document.getElementById("mapTitle").style.display = "block";
+        document.getElementById("emptySheet").style.display = "none";
+
+        const headers = cols[0];
+        const columnsHtml = buildColumnOptions(headers);
+        const automap = computeAutomap(headers);
+        const selectCols = document.getElementsByClassName("selectCols");
+
+        for (let j = 0; j < selectCols.length; j++) {
+          selectCols[j].innerHTML = columnsHtml;
+          const fieldId = selectCols[j].id;
+          // Priority: saved mapping (if its column still exists) → automap → default
+          const saved = mapData[fieldId];
+          const savedIsValid = saved && saved !== "--" && headers.includes(saved);
+          const value = savedIsValid ? saved : automap[fieldId] || "--";
+          selectCols[j].value = value;
         }
       }
 

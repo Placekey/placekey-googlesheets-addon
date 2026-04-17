@@ -426,8 +426,8 @@ function generateKeys(config, uniqueKey) {
     expandedFields.push(...GEOCODE_FIELDS);
   }
 
-  const baseFields = INSERT_ERROR ? ["placekey", ERROR_KEY] : ["placekey"];
-  const allFieldNames = baseFields.concat(expandedFields);
+  // Error column (if enabled) goes last so it appears after all requested fields
+  const allFieldNames = INSERT_ERROR ? ["placekey", ...expandedFields, ERROR_KEY] : ["placekey", ...expandedFields];
 
   // Sheet setup
   const ss = SpreadsheetApp.getActiveSheet();

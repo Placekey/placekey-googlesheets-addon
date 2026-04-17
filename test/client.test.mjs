@@ -216,6 +216,75 @@ describe("buildColumnOptions", () => {
 });
 
 // ==========================================
+// computeAutomap (pure logic, no DOM needed)
+// ==========================================
+describe("computeAutomap", () => {
+  it("maps the exact sample data headers correctly", () => {
+    const headers = ["Name", "Street Address", "City", "State", "Zip code", "Latitude", "Longitude", "Country"];
+    const result = client.computeAutomap(headers);
+    expect(result.location_name).toBe("Name");
+    expect(result.street_address).toBe("Street Address");
+    expect(result.city).toBe("City");
+    expect(result.region).toBe("State");
+    expect(result.postal_code).toBe("Zip code");
+    expect(result.latitude).toBe("Latitude");
+    expect(result.longitude).toBe("Longitude");
+    expect(result.iso_country_code).toBe("Country");
+  });
+
+  it("is case-insensitive", () => {
+    const result = client.computeAutomap(["NAME", "street address", "City"]);
+    expect(result.location_name).toBe("NAME");
+    expect(result.street_address).toBe("street address");
+    expect(result.city).toBe("City");
+  });
+
+  it("trims whitespace", () => {
+    const result = client.computeAutomap(["  Name  ", "  City  "]);
+    expect(result.location_name).toBe("  Name  ");
+    expect(result.city).toBe("  City  ");
+  });
+
+  it("recognizes common abbreviations", () => {
+    const result = client.computeAutomap(["Lat", "Lng", "Zip"]);
+    expect(result.latitude).toBe("Lat");
+    expect(result.longitude).toBe("Lng");
+    expect(result.postal_code).toBe("Zip");
+  });
+
+  it("maps metadata headers", () => {
+    const result = client.computeAutomap(["Phone", "NAICS", "Website", "Store ID", "MCC"]);
+    expect(result.phone_number).toBe("Phone");
+    expect(result.naics_code).toBe("NAICS");
+    expect(result.website).toBe("Website");
+    expect(result.store_id).toBe("Store ID");
+    expect(result.mcc_code).toBe("MCC");
+  });
+
+  it("skips empty header strings", () => {
+    const result = client.computeAutomap(["Name", "", "City"]);
+    expect(result.location_name).toBe("Name");
+    expect(result.city).toBe("City");
+  });
+
+  it("returns empty object when no headers match", () => {
+    const result = client.computeAutomap(["Foo", "Bar", "Baz"]);
+    expect(Object.keys(result)).toHaveLength(0);
+  });
+
+  it("first match wins when multiple headers map to the same field", () => {
+    const result = client.computeAutomap(["Name", "Business Name"]);
+    // Both "Name" and "Business Name" map to location_name — first wins
+    expect(result.location_name).toBe("Name");
+  });
+
+  it("handles empty array", () => {
+    const result = client.computeAutomap([]);
+    expect(result).toEqual({});
+  });
+});
+
+// ==========================================
 // Client-server validation consistency
 // ==========================================
 describe("client-server validation consistency", () => {
