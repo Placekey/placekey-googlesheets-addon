@@ -144,14 +144,11 @@
   .field[data-state="mapped"] .field__dot {
     background: var(--pk-success);
   }
-  .field[data-state="automapped"] .field__dot {
-    background: var(--pk-warning-dot);
-  }
   .field[data-state="conflict"] .field__dot {
     background: var(--pk-danger);
   }
   .field[data-state="mapped"] .field__example,
-  .field[data-state="automapped"] .field__example {
+  .field[data-state="conflict"] .field__example {
     display: none;
   }
 
@@ -184,9 +181,6 @@
   }
   .field[data-state="mapped"] select {
     border-color: var(--pk-success);
-  }
-  .field[data-state="automapped"] select {
-    border-color: var(--pk-warning-dot);
   }
   .field[data-state="conflict"] select {
     border-color: var(--pk-danger);
