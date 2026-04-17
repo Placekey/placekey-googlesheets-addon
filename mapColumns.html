@@ -109,61 +109,6 @@
           <div class="field__example">ISO code, e.g. US</div>
         </div>
 
-        <details class="disclosure" id="disclosure-additional">
-          <summary class="disclosure__summary">
-            <span>Additional input fields</span>
-            <span class="disclosure__badge" id="additionalCount">0</span>
-          </summary>
-          <div class="disclosure__content">
-            <p class="disclosure__note">More details on <a href="https://docs.placekey.io/documentation/placekey-api/input-parameters/optional-parameters" target="_blank" rel="noopener">optional parameters</a>.</p>
-
-            <div class="field" data-field="phone_number">
-              <div class="field__row">
-                <span class="field__dot" aria-hidden="true"></span>
-                <label for="phone_number" class="field__label">Phone Number</label>
-              </div>
-              <select id="phone_number" class="selectCols"></select>
-              <div class="field__example">e.g. 1234567890</div>
-            </div>
-
-            <div class="field" data-field="naics_code">
-              <div class="field__row">
-                <span class="field__dot" aria-hidden="true"></span>
-                <label for="naics_code" class="field__label">NAICS Code</label>
-              </div>
-              <select id="naics_code" class="selectCols"></select>
-              <div class="field__example">e.g. 712120</div>
-            </div>
-
-            <div class="field" data-field="website">
-              <div class="field__row">
-                <span class="field__dot" aria-hidden="true"></span>
-                <label for="website" class="field__label">Website</label>
-              </div>
-              <select id="website" class="selectCols"></select>
-              <div class="field__example">e.g. sfgsa.org</div>
-            </div>
-
-            <div class="field" data-field="store_id">
-              <div class="field__row">
-                <span class="field__dot" aria-hidden="true"></span>
-                <label for="store_id" class="field__label">Store ID</label>
-              </div>
-              <select id="store_id" class="selectCols"></select>
-              <div class="field__example">e.g. 1234</div>
-            </div>
-
-            <div class="field" data-field="mcc_code">
-              <div class="field__row">
-                <span class="field__dot" aria-hidden="true"></span>
-                <label for="mcc_code" class="field__label">MCC Code</label>
-              </div>
-              <select id="mcc_code" class="selectCols"></select>
-              <div class="field__example">e.g. 9399</div>
-            </div>
-          </div>
-        </details>
-
         <details class="disclosure" id="disclosure-returns" open>
           <summary class="disclosure__summary">
             <span>Return fields</span>
@@ -492,8 +437,6 @@
       // ==========================================
       // State management
       // ==========================================
-      const mainFieldIds = ["location_name", "street_address", "city", "region", "postal_code", "latitude", "longitude", "iso_country_code"];
-      const metadataFieldIds = ["phone_number", "naics_code", "website", "store_id", "mcc_code"];
       const userTouched = new Set();
       const autoFilled = new Set();
 
@@ -587,16 +530,37 @@
       }
 
       function updateBadgeCounts() {
-        const mappings = currentMappings();
-        const additional = metadataFieldIds.filter((id) => mappings[id] && mappings[id] !== "--").length;
         const returns = Array.from(document.getElementsByClassName("returnFields")).filter((i) => i.checked).length;
-
-        const addBadge = document.getElementById("additionalCount");
         const retBadge = document.getElementById("returnCount");
-        addBadge.textContent = additional;
         retBadge.textContent = returns;
-        addBadge.classList.toggle("disclosure__badge--active", additional > 0);
         retBadge.classList.toggle("disclosure__badge--active", returns > 0);
+      }
+
+      // ==========================================
+      // Preferences auto-save (user-level, cross-sheet)
+      // ==========================================
+      let savePrefsTimer = null;
+      function savePrefsDebounced() {
+        if (savePrefsTimer) clearTimeout(savePrefsTimer);
+        savePrefsTimer = setTimeout(() => {
+          const requestFields = Array.from(document.getElementsByClassName("returnFields"))
+            .filter((i) => i.checked)
+            .map((i) => i.name);
+          const insertError = document.getElementById("insertError").checked;
+          google.script.run.withFailureHandler((err) => console.log("savePrefs", err)).saveUserPrefs({ requestFields, insertError });
+        }, 400);
+      }
+
+      function applyUserPrefs(userPrefs) {
+        if (!userPrefs) return;
+        if (Array.isArray(userPrefs.requestFields)) {
+          for (const cb of document.getElementsByClassName("returnFields")) {
+            cb.checked = userPrefs.requestFields.includes(cb.name);
+          }
+        }
+        if (typeof userPrefs.insertError === "boolean") {
+          document.getElementById("insertError").checked = userPrefs.insertError;
+        }
       }
 
       function refreshUI() {
@@ -613,8 +577,13 @@
           });
         }
         for (const cb of document.getElementsByClassName("returnFields")) {
-          cb.addEventListener("change", updateBadgeCounts);
+          cb.addEventListener("change", () => {
+            updateBadgeCounts();
+            savePrefsDebounced();
+          });
         }
+        const insertErr = document.getElementById("insertError");
+        if (insertErr) insertErr.addEventListener("change", savePrefsDebounced);
       }
 
       // ==========================================
@@ -638,7 +607,7 @@
         google.script.run.withSuccessHandler(updateColumns).changeSheet(selectedSheet);
       }
 
-      function updateColumns({ cols, mapData, learnedAliases } = { cols: false, mapData: {}, learnedAliases: {} }) {
+      function updateColumns({ cols, mapData, learnedAliases, userPrefs } = { cols: false, mapData: {}, learnedAliases: {}, userPrefs: {} }) {
         if (!mapData) mapData = {};
         if (!learnedAliases) learnedAliases = {};
         const emptyEl = document.getElementById("emptySheet");
@@ -671,6 +640,8 @@
           }
           sel.value = value;
         }
+
+        applyUserPrefs(userPrefs);
         refreshUI();
       }
 

@@ -20,6 +20,7 @@ const USER_AGENT = "placekey-googlesheets/0.0.9";
 const MAX_RETRIES = 3;
 const RATE_LIMIT_MS = 1100;
 const LEARNED_ALIASES_KEY = "learned_aliases";
+const USER_PREFS_KEY = "user_prefs";
 
 // ==========================================
 // Triggers
@@ -79,6 +80,24 @@ function saveLearnedAliases(columnMappings) {
 }
 
 // ==========================================
+// User Preferences (return fields + options, per-user cross-sheet)
+// ==========================================
+function getUserPrefs() {
+  const data = PropertiesService.getUserProperties().getProperty(USER_PREFS_KEY);
+  try {
+    return JSON.parse(data) || {};
+  } catch (_e) {
+    return {};
+  }
+}
+
+function saveUserPrefs(prefs) {
+  if (!prefs || typeof prefs !== "object") return;
+  const merged = { ...getUserPrefs(), ...prefs };
+  PropertiesService.getUserProperties().setProperty(USER_PREFS_KEY, JSON.stringify(merged));
+}
+
+// ==========================================
 // UI Display
 // ==========================================
 function showHelp() {
@@ -120,7 +139,8 @@ function getActiveSheetInfo() {
   const cols = sheet.getRange(1, 1, 1, sheet.getLastColumn()).getDisplayValues();
   const mapData = getMapColumnsData(sheet.getSheetId());
   const learnedAliases = getLearnedAliases();
-  return { cols, mapData, learnedAliases };
+  const userPrefs = getUserPrefs();
+  return { cols, mapData, learnedAliases, userPrefs };
 }
 
 function getSheets() {
@@ -131,7 +151,7 @@ function getSheets() {
   try {
     return [active, sheetNames, getActiveSheetInfo()];
   } catch (_e) {
-    return [active, sheetNames, { cols: false, mapData: [], learnedAliases: {} }];
+    return [active, sheetNames, { cols: false, mapData: [], learnedAliases: {}, userPrefs: {} }];
   }
 }
 
@@ -143,7 +163,7 @@ function changeSheet(selectedSheet) {
     const mapData = getMapColumnsData(sheet.getSheetId());
     return { cols, mapData };
   } catch (_e) {
-    return { cols: false, mapData: [], learnedAliases: {} };
+    return { cols: false, mapData: [], learnedAliases: {}, userPrefs: {} };
   }
 }
 
@@ -154,7 +174,7 @@ function refreshUpdateSheet() {
   try {
     return [sheetName, sheetNames, getActiveSheetInfo()];
   } catch (_e) {
-    return [sheetName, sheetNames, { cols: false, mapData: [], learnedAliases: {} }];
+    return [sheetName, sheetNames, { cols: false, mapData: [], learnedAliases: {}, userPrefs: {} }];
   }
 }
 
@@ -171,7 +191,7 @@ function insertSample() {
   ss.getRange(1, 1, sampleData.length, sampleData[0].length).setValues(sampleData);
   ss.setFrozenRows(1);
   showPlaceKeyUI();
-  return { cols: false, mapData: [], learnedAliases: {} };
+  return { cols: false, mapData: [], learnedAliases: {}, userPrefs: {} };
 }
 
 function testUser() {
@@ -237,7 +257,9 @@ function mapRowToObject(row, columnMappings) {
   }
   result.place_metadata = {};
   for (const field of METADATA_FIELDS) {
-    result.place_metadata[field] = columnMappings[field] === NO_INPUT_STRING ? "" : row[columnMappings[field].rowIndex];
+    const mapping = columnMappings[field];
+    // Handle undefined (field not present in client mapping) the same as unmapped.
+    result.place_metadata[field] = !mapping || mapping === NO_INPUT_STRING ? "" : row[mapping.rowIndex];
   }
   return result;
 }
@@ -467,9 +489,10 @@ function generateKeys(config, uniqueKey) {
     .filter((h) => h.length > 0);
   const totalRows = ss.getLastRow();
 
-  // Save raw column mappings (copy before transforming) + learn user-level aliases
+  // Save raw column mappings (copy before transforming) + learn user-level aliases + user prefs
   setMapColumnsData(sheetId, { ...columnMappings });
   saveLearnedAliases(columnMappings);
+  saveUserPrefs({ requestFields, insertError: INSERT_ERROR });
   const transformed = transformColumnMappings(columnMappings, colsHeader);
 
   // Read all data rows
