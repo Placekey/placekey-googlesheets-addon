@@ -118,7 +118,7 @@ function changeKey() {
 }
 
 function showApiKeyDialog() {
-  const output = HtmlService.createTemplateFromFile("setKey").evaluate().setWidth(500).setHeight(150);
+  const output = HtmlService.createTemplateFromFile("setKey").evaluate().setWidth(500).setHeight(210);
   SpreadsheetApp.getUi().showModalDialog(output, "API Key");
 }
 

@@ -192,7 +192,8 @@
     border-color: var(--pk-danger);
   }
 
-  input[type="text"] {
+  input[type="text"],
+  input[type="password"] {
     width: 100%;
     height: 32px;
     padding: 0 10px;
@@ -202,7 +203,8 @@
     border: 1px solid var(--pk-border);
     border-radius: var(--pk-radius-sm);
   }
-  input[type="text"]:focus-visible {
+  input[type="text"]:focus-visible,
+  input[type="password"]:focus-visible {
     outline: none;
     border-color: var(--pk-primary);
     box-shadow: 0 0 0 2px var(--pk-primary-ring);
