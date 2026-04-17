@@ -194,16 +194,14 @@ describe("prepareOutputFields edge cases", () => {
   });
 
   it("handles geocode sub-fields", () => {
-    const fields = gs.prepareOutputFields(["geocode_latitude", "geocode_longitude", "geocode_lat_long", "geocode_precision"], []);
+    const fields = gs.prepareOutputFields(["geocode_latitude", "geocode_longitude", "geocode_precision"], []);
     expect(fields.geocode_latitude.displayName).toBe("Geocode Latitude");
     expect(fields.geocode_longitude.displayName).toBe("Geocode Longitude");
-    expect(fields.geocode_lat_long.displayName).toBe("Geocode Lat Long");
     expect(fields.geocode_precision.displayName).toBe("Geocode Precision");
     // Sequential indexes
     expect(fields.geocode_latitude.columnIndex).toBe(0);
     expect(fields.geocode_longitude.columnIndex).toBe(1);
-    expect(fields.geocode_lat_long.columnIndex).toBe(2);
-    expect(fields.geocode_precision.columnIndex).toBe(3);
+    expect(fields.geocode_precision.columnIndex).toBe(2);
   });
 
   it("reuses multiple existing columns without gaps", () => {

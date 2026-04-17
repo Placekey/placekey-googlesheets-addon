@@ -5,7 +5,7 @@ const ADD_ON_NAME = "Placekey:";
 const NO_INPUT_STRING = "--";
 const ERROR_KEY = "placekey_error";
 const EMPTY_ROW_ERROR_MESSAGE = "There were no values in the row.";
-const GEOCODE_FIELDS = ["geocode_latitude", "geocode_longitude", "geocode_lat_long", "geocode_precision"];
+const GEOCODE_FIELDS = ["geocode_latitude", "geocode_longitude", "geocode_precision"];
 const MAIN_FIELDS = ["location_name", "street_address", "city", "region", "postal_code", "latitude", "longitude", "iso_country_code"];
 const METADATA_FIELDS = ["store_id", "phone_number", "website", "naics_code", "mcc_code"];
 const MINIMUM_INPUTS = [
@@ -567,9 +567,6 @@ function generateKeys(config, uniqueKey) {
         if (field === "geocode" && value) {
           if (results.geocode_latitude) results.geocode_latitude[rowIndex] = value.location.lat;
           if (results.geocode_longitude) results.geocode_longitude[rowIndex] = value.location.lng;
-          if (results.geocode_lat_long) {
-            results.geocode_lat_long[rowIndex] = `(${value.location.lat}, ${value.location.lng})`;
-          }
           if (results.geocode_precision) results.geocode_precision[rowIndex] = value.location_type;
         } else if (results[field] !== undefined) {
           results[field][rowIndex] = value;
