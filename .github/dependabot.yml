@@ -1,0 +1,29 @@
+version: 2
+updates:
+  # npm dependencies
+  - package-ecosystem: "npm"
+    assignees:
+      - "arawinters"
+    cooldown:
+      default-days: 21
+    directory: "/"
+    schedule:
+      interval: "daily"
+    commit-message:
+      prefix: "deps(npm):"
+
+  # GitHub Actions
+  - package-ecosystem: "github-actions"
+    assignees:
+      - "kernelsam"
+    cooldown:
+      default-days: 21
+      exclude:
+        - "senzing-factory/*"
+    directory: "/"
+    groups:
+      senzing-factory:
+        patterns:
+          - "senzing-factory/*"
+    schedule:
+      interval: "daily"

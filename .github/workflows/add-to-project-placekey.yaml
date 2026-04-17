@@ -1,0 +1,22 @@
+name: Add to project placekey
+
+on:
+  issues:
+    types:
+      - opened
+      - reopened
+
+permissions: {}
+
+jobs:
+  add-to-project:
+    permissions:
+      repository-projects: write
+    secrets:
+      PROJECT_RW_TOKEN: ${{ secrets.PLACEKEY_GITHUB_PROJECT_RW_TOKEN }}
+      SLACK_BOT_TOKEN: ${{ secrets.SLACK_BOT_TOKEN }}
+      SLACK_CHANNEL: ${{ secrets.SLACK_CHANNEL }}
+    uses: senzing-factory/build-resources/.github/workflows/add-to-project.yaml@5054409094ee8f157395df086da166a898bbe1e9 # v4
+    with:
+      project-number: ${{ vars.PLACEKEY_PROJECT_PLACEKEY }}
+      org: ${{ vars.PLACEKEY_GITHUB_ACCOUNT_NAME }}
