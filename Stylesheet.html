@@ -110,46 +110,38 @@
     margin: 16px 0 4px;
   }
 
-  /* Field */
+  /* Field (compact row layout — label left, select right) */
   .field {
-    margin-top: 10px;
-  }
-  .field__row {
-    display: flex;
+    display: grid;
+    grid-template-columns: 110px 1fr;
     align-items: center;
-    gap: 6px;
-    margin-bottom: 4px;
+    column-gap: 8px;
+    margin-top: 4px;
   }
   .field__dot {
-    width: 8px;
-    height: 8px;
+    display: inline-block;
+    vertical-align: middle;
+    width: 7px;
+    height: 7px;
     border-radius: 50%;
     background: var(--pk-border);
+    margin-right: 4px;
     transition: background 120ms ease;
-    flex-shrink: 0;
   }
   .field__label {
     font-size: 12px;
     font-weight: 500;
     color: var(--pk-text);
-    flex: 1;
     cursor: help;
-  }
-  .field__example {
-    font-size: 11px;
-    color: var(--pk-text-subtle);
-    margin-top: 2px;
-    font-style: italic;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
   }
   .field[data-state="mapped"] .field__dot {
     background: var(--pk-success);
   }
   .field[data-state="conflict"] .field__dot {
     background: var(--pk-danger);
-  }
-  .field[data-state="mapped"] .field__example,
-  .field[data-state="conflict"] .field__example {
-    display: none;
   }
 
   /* Form controls */
