@@ -56,14 +56,14 @@
         </div>
 
         <div class="form__group mt-20">
-          <label for="region" class="form__label"> <strong>Region</strong> - e.g. California or CA </label>
+          <label for="region" class="form__label"> <strong>Region</strong> - e.g. California, Ontario, or Kent </label>
           <select id="region" class="selectCols form__control">
             <option value="--">--</option>
           </select>
         </div>
 
         <div class="form__group mt-20">
-          <label for="postal_code" class="form__label"> <strong>Postal Code</strong> - e.g. 94131 </label>
+          <label for="postal_code" class="form__label"> <strong>Postal Code</strong> - e.g. 94131, M5V 3A8, or SW1A 1AA </label>
           <select id="postal_code" class="selectCols form__control">
             <option value="--">--</option>
           </select>
@@ -84,7 +84,7 @@
         </div>
 
         <div class="form__group mt-20">
-          <label for="iso_country_code" class="form__label"> <strong>Country</strong> - e.g. US </label>
+          <label for="iso_country_code" class="form__label"> <strong>Country</strong> - e.g. US, CA, or GB </label>
           <select id="iso_country_code" class="selectCols form__control">
             <option value="--">--</option>
           </select>
@@ -255,35 +255,55 @@
         line1: "street_address",
         mailingaddress: "street_address",
         streetname: "street_address",
+        fulladdress: "street_address",
+        primaryaddress: "street_address",
+        mainaddress: "street_address",
+        road: "street_address",
+        numberandstreet: "street_address",
 
         // city
         city: "city",
         cityname: "city",
         town: "city",
+        township: "city",
         municipality: "city",
         locality: "city",
+        village: "city",
 
-        // region
+        // region (state, province, county, territory)
         state: "region",
         statename: "region",
         statecode: "region",
         stateabbrev: "region",
+        stateabbreviation: "region",
         region: "region",
         province: "region",
+        provincename: "region",
+        provincecode: "region",
+        prov: "region",
         territory: "region",
         stateprovince: "region",
+        stateterritory: "region",
+        provinceorterritory: "region",
+        provinceterritory: "region",
+        county: "region", // UK/IE region term
+        countyname: "region",
         adminarea: "region",
         administrativearea: "region",
+        adminlevel1: "region",
 
         // postal_code
         zip: "postal_code",
         zipcode: "postal_code",
         zip5: "postal_code",
         zipcode5: "postal_code",
+        zipplus4: "postal_code",
         postal: "postal_code",
         postalcode: "postal_code",
-        postcode: "postal_code",
+        postcode: "postal_code", // UK
+        postcodeuk: "postal_code",
         pincode: "postal_code",
+        eircode: "postal_code", // Ireland
 
         // latitude
         latitude: "latitude",
@@ -304,13 +324,17 @@
         xcoord: "longitude",
         xcoordinate: "longitude",
 
-        // iso_country_code
+        // iso_country_code (US, CA, GB, etc.)
         country: "iso_country_code",
         countrycode: "iso_country_code",
         countryname: "iso_country_code",
+        countryiso: "iso_country_code",
         isocountrycode: "iso_country_code",
+        iso: "iso_country_code",
         iso2: "iso_country_code",
+        iso3: "iso_country_code",
         iso3166: "iso_country_code",
+        isoalpha2: "iso_country_code",
         cc: "iso_country_code",
         nation: "iso_country_code",
         nationcode: "iso_country_code",
@@ -372,7 +396,51 @@
         return str
           .toLowerCase()
           .trim()
-          .replace(/[\s_\-.]+/g, "");
+          .replace(/[\s_\-./]+/g, "");
+      }
+
+      // Classic two-row Levenshtein distance. O(m*n) time, O(min(m,n)) space.
+      function editDistance(a, b) {
+        if (a === b) return 0;
+        if (a.length === 0) return b.length;
+        if (b.length === 0) return a.length;
+        // Ensure a is the shorter string to use less memory
+        if (a.length > b.length) [a, b] = [b, a];
+        let prev = Array.from({ length: a.length + 1 }, (_, i) => i);
+        let curr = new Array(a.length + 1);
+        for (let j = 1; j <= b.length; j++) {
+          curr[0] = j;
+          for (let i = 1; i <= a.length; i++) {
+            curr[i] = a[i - 1] === b[j - 1] ? prev[i - 1] : 1 + Math.min(prev[i - 1], prev[i], curr[i - 1]);
+          }
+          [prev, curr] = [curr, prev];
+        }
+        return prev[a.length];
+      }
+
+      // Max allowed edits scales with the header length — strict for short
+      // strings (where 1 edit changes the meaning) and more permissive for long ones.
+      function fuzzyThreshold(len) {
+        if (len < 5) return 0; // exact only
+        if (len <= 7) return 1;
+        return 2;
+      }
+
+      function fuzzyMatchField(normalized, aliasMap) {
+        const max = fuzzyThreshold(normalized.length);
+        if (max === 0) return null;
+        let bestDistance = max + 1;
+        let bestField = null;
+        for (const aliasKey of Object.keys(aliasMap)) {
+          // Quick reject: if lengths differ by more than the threshold, skip
+          if (Math.abs(aliasKey.length - normalized.length) > max) continue;
+          const d = editDistance(normalized, aliasKey);
+          if (d < bestDistance) {
+            bestDistance = d;
+            bestField = aliasMap[aliasKey];
+          }
+        }
+        return bestField;
       }
 
       function computeAutomap(headers, learnedAliases = {}) {
@@ -380,8 +448,8 @@
         for (const header of headers) {
           if (!header) continue;
           const key = normalizeHeader(header);
-          // Priority: user-learned aliases → built-in aliases
-          const fieldId = learnedAliases[key] || AUTO_MAP_ALIASES[key];
+          // Priority: exact learned → exact built-in → fuzzy learned → fuzzy built-in
+          const fieldId = learnedAliases[key] || AUTO_MAP_ALIASES[key] || fuzzyMatchField(key, learnedAliases) || fuzzyMatchField(key, AUTO_MAP_ALIASES);
           // First matching header wins if multiple map to the same field
           if (fieldId && !automap[fieldId]) {
             automap[fieldId] = header;

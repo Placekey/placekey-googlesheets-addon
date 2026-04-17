@@ -72,7 +72,7 @@ function saveLearnedAliases(columnMappings) {
     const key = columnName
       .toLowerCase()
       .trim()
-      .replace(/[\s_\-.]+/g, "");
+      .replace(/[\s_\-./]+/g, "");
     aliases[key] = fieldId;
   }
   PropertiesService.getUserProperties().setProperty(LEARNED_ALIASES_KEY, JSON.stringify(aliases));

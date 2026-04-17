@@ -363,6 +363,107 @@ describe("computeAutomap", () => {
     expect(client.computeAutomap(["Domain"]).website).toBe("Domain");
     expect(client.computeAutomap(["Merchant Category"]).mcc_code).toBe("Merchant Category");
   });
+
+  it("maps a typical US headers row", () => {
+    const headers = ["Business Name", "Street Address", "City", "State", "ZIP Code", "Country"];
+    const result = client.computeAutomap(headers);
+    expect(result.location_name).toBe("Business Name");
+    expect(result.street_address).toBe("Street Address");
+    expect(result.city).toBe("City");
+    expect(result.region).toBe("State");
+    expect(result.postal_code).toBe("ZIP Code");
+    expect(result.iso_country_code).toBe("Country");
+  });
+
+  it("maps a typical Canadian headers row", () => {
+    const headers = ["Company", "Street", "City", "Province", "Postal Code", "Country Code"];
+    const result = client.computeAutomap(headers);
+    expect(result.location_name).toBe("Company");
+    expect(result.street_address).toBe("Street");
+    expect(result.city).toBe("City");
+    expect(result.region).toBe("Province");
+    expect(result.postal_code).toBe("Postal Code");
+    expect(result.iso_country_code).toBe("Country Code");
+  });
+
+  it("maps a typical UK headers row", () => {
+    const headers = ["Business", "Address Line 1", "Town", "County", "Postcode", "Country"];
+    const result = client.computeAutomap(headers);
+    expect(result.location_name).toBe("Business");
+    expect(result.street_address).toBe("Address Line 1");
+    expect(result.city).toBe("Town");
+    expect(result.region).toBe("County");
+    expect(result.postal_code).toBe("Postcode");
+    expect(result.iso_country_code).toBe("Country");
+  });
+
+  it("recognizes Canadian-specific region terms", () => {
+    expect(client.computeAutomap(["Prov"]).region).toBe("Prov");
+    expect(client.computeAutomap(["Province Code"]).region).toBe("Province Code");
+    expect(client.computeAutomap(["Territory"]).region).toBe("Territory");
+    expect(client.computeAutomap(["Province/Territory"]).region).toBe("Province/Territory");
+  });
+
+  it("recognizes UK-specific terms", () => {
+    expect(client.computeAutomap(["County"]).region).toBe("County");
+    expect(client.computeAutomap(["Postcode"]).postal_code).toBe("Postcode");
+    expect(client.computeAutomap(["Eircode"]).postal_code).toBe("Eircode");
+    expect(client.computeAutomap(["Village"]).city).toBe("Village");
+    expect(client.computeAutomap(["Road"]).street_address).toBe("Road");
+  });
+
+  it("recognizes expanded ISO country variants", () => {
+    expect(client.computeAutomap(["ISO"]).iso_country_code).toBe("ISO");
+    expect(client.computeAutomap(["ISO-3166"]).iso_country_code).toBe("ISO-3166");
+    expect(client.computeAutomap(["ISO Alpha 2"]).iso_country_code).toBe("ISO Alpha 2");
+    expect(client.computeAutomap(["Country ISO"]).iso_country_code).toBe("Country ISO");
+  });
+
+  it("prefers first matching header when State and County both present (US case)", () => {
+    // US data often has both "State" and "County" — State should win for region
+    const result = client.computeAutomap(["State", "County"]);
+    expect(result.region).toBe("State");
+  });
+
+  it("fuzzy-matches common typos", () => {
+    expect(client.computeAutomap(["Adress"]).street_address).toBe("Adress");
+    expect(client.computeAutomap(["Streat"]).street_address).toBe("Streat");
+    expect(client.computeAutomap(["Latitde"]).latitude).toBe("Latitde");
+    expect(client.computeAutomap(["Lattitude"]).latitude).toBe("Lattitude");
+    expect(client.computeAutomap(["Longtude"]).longitude).toBe("Longtude");
+    expect(client.computeAutomap(["Phonne"]).phone_number).toBe("Phonne");
+    expect(client.computeAutomap(["Websit"]).website).toBe("Websit");
+  });
+
+  it("fuzzy threshold scales with length", () => {
+    // Length < 5: exact only, no fuzzy
+    expect(client.computeAutomap(["Nam"]).location_name).toBeUndefined();
+    expect(client.computeAutomap(["Citi"]).city).toBeUndefined();
+    // Length 5-7: allow 1 edit — "phonee" → "phone"
+    expect(client.computeAutomap(["phonee"]).phone_number).toBe("phonee");
+    // Length >= 8: allow 2 edits
+    expect(client.computeAutomap(["latittude"]).latitude).toBe("latittude");
+  });
+
+  it("exact matches always win over fuzzy", () => {
+    // "state" exactly matches built-in, shouldn't fuzzy-match anything
+    const result = client.computeAutomap(["State"]);
+    expect(result.region).toBe("State");
+  });
+
+  it("fuzzy does not match totally unrelated headers", () => {
+    const result = client.computeAutomap(["Foobar", "QuantumFlux", "Revenue", "Margin"]);
+    expect(Object.keys(result)).toHaveLength(0);
+  });
+
+  it("editDistance is a classical Levenshtein implementation", () => {
+    expect(client.editDistance("kitten", "sitting")).toBe(3);
+    expect(client.editDistance("", "abc")).toBe(3);
+    expect(client.editDistance("abc", "")).toBe(3);
+    expect(client.editDistance("same", "same")).toBe(0);
+    expect(client.editDistance("abc", "abd")).toBe(1);
+    expect(client.editDistance("address", "adress")).toBe(1);
+  });
 });
 
 // ==========================================
