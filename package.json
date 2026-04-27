@@ -1,6 +1,6 @@
 {
   "name": "placekey-googlesheets-addon",
-  "version": "0.0.9",
+  "version": "1.0.0",
   "private": true,
   "scripts": {
     "lint": "eslint '*.gs'",
@@ -10,7 +10,7 @@
     "push": "clasp push",
     "open": "clasp open",
     "clasp:login": "clasp login",
-    "clasp:create": "clasp create --type sheets --title 'Placekey Add-on'"
+    "clasp:create": "clasp create --type standalone --title 'Placekey for Google Sheets'"
   },
   "devDependencies": {
     "@google/clasp": "^3.3.0",

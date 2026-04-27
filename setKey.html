@@ -37,7 +37,7 @@
     </div>
 
     <script>
-      google.script.run.withFailureHandler(failHandler).withSuccessHandler(successHandler).testUser();
+      google.script.run.withFailureHandler(failHandler).withSuccessHandler(successHandler).pingAuth();
 
       document.addEventListener("DOMContentLoaded", () => {
         google.script.run

@@ -16,7 +16,7 @@ const MINIMUM_INPUTS = [
 ];
 const API_BATCH_SIZE = 100;
 const API_URL = "https://api.placekey.io/v1/placekeys";
-const USER_AGENT = "placekey-googlesheets/0.0.9";
+const USER_AGENT = "placekey-googlesheets/1.0.0";
 const MAX_RETRIES = 3;
 const RATE_LIMIT_MS = 1100;
 const LEARNED_ALIASES_KEY = "learned_aliases";
@@ -180,6 +180,9 @@ function refreshUpdateSheet() {
 
 function insertSample() {
   const ss = SpreadsheetApp.getActiveSheet();
+  if (ss.getLastRow() > 0 || ss.getLastColumn() > 0) {
+    throw new Error("Sample data can only be inserted into an empty sheet. Create a new tab or clear this one first.");
+  }
   const sampleData = [
     ["Name", "Street Address", "City", "State", "Zip code", "Latitude", "Longitude", "Country"],
     ["Twin Peaks Petroleum", "598 Portola Dr", "San Francisco", "CA", "94131", "37.7371", "-122.44283", "US"],
@@ -194,13 +197,8 @@ function insertSample() {
   return { cols: false, mapData: [], learnedAliases: {}, userPrefs: {} };
 }
 
-function testUser() {
+function pingAuth() {
   return SpreadsheetApp.getActiveSpreadsheet().getActiveSheet().getName();
-}
-
-function reset() {
-  PropertiesService.getUserProperties().deleteAllProperties();
-  resetMapColumnsData();
 }
 
 // ==========================================
