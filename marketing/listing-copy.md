@@ -56,7 +56,7 @@ end users.
 > details.
 >
 > **Support**: Documentation at
-> [docs.placekey.io](https://docs.placekey.io). For help, contact
+> [docs.placekey.io](https://docs.placekey.io). For help, email
 > [support@placekey.io](mailto:support@placekey.io).
 
 ## Screenshot captions
@@ -105,7 +105,7 @@ To test:
 | Languages | English |
 | Developer name | Placekey |
 | Developer website | https://placekey.io |
-| Developer email | (Placekey shared developer-contact email) |
+| Developer email | support@placekey.io |
 | Privacy policy URL | https://www.placekey.io/privacy-policy |
-| Terms of service URL | (Placekey ToS URL, optional) |
-| Support URL | (Placekey support URL, required, no auth wall) |
+| Terms of service URL | https://www.placekey.io/terms-of-service |
+| Support URL | mailto:support@placekey.io (Marketplace accepts mailto for the Support URL field) |
