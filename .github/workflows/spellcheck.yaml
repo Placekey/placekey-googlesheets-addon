@@ -14,4 +14,4 @@ jobs:
   spellcheck:
     permissions:
       contents: read
-    uses: senzing-factory/build-resources/.github/workflows/cspell.yaml@972b391477df5e92c899aa62d410401509c74dfe # v4
+    uses: senzing-factory/build-resources/.github/workflows/cspell.yaml@4f064da7dfb3a9481a886fd5ed9cffa1c0abc946 # v4
