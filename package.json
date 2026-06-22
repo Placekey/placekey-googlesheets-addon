@@ -17,7 +17,7 @@
     "eslint": "^10.0.0",
     "happy-dom": "^20.9.0",
     "prettier": "^3.2.0",
-    "vitest": "^4.1.7"
+    "vitest": "^4.1.8"
   },
   "overrides": {
     "uuid": "^14.0.0"
