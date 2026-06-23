@@ -16,7 +16,7 @@ jobs:
       PROJECT_RW_TOKEN: ${{ secrets.PLACEKEY_GITHUB_PROJECT_RW_TOKEN }}
       SLACK_BOT_TOKEN: ${{ secrets.SLACK_BOT_TOKEN }}
       SLACK_CHANNEL: ${{ secrets.SLACK_CHANNEL }}
-    uses: senzing-factory/build-resources/.github/workflows/add-to-project.yaml@4f064da7dfb3a9481a886fd5ed9cffa1c0abc946 # v4
+    uses: senzing-factory/build-resources/.github/workflows/add-to-project.yaml@8141494442be199945d6d119665da9712f37303c # v4
     with:
       project-number: ${{ vars.PLACEKEY_PROJECT_PLACEKEY }}
       org: ${{ vars.PLACEKEY_GITHUB_ACCOUNT_NAME }}
