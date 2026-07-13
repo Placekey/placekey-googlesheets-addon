@@ -12,7 +12,7 @@ permissions: {}
 
 jobs:
   review:
-    uses: senzing-factory/build-resources/.github/workflows/claude-pull-request-review.yaml@a164168badaaadd037d3f0bf1dddf963dda5208a # v4
+    uses: senzing-factory/build-resources/.github/workflows/claude-pull-request-review.yaml@b4d8b531b66da53dcaef71a70285de492eff4c2b # v4
     permissions:
       contents: read
       pull-requests: write
