@@ -13,6 +13,6 @@ jobs:
       repository-projects: write
     secrets:
       PROJECT_RW_TOKEN: ${{ secrets.PLACEKEY_GITHUB_PROJECT_RW_TOKEN }}
-    uses: senzing-factory/build-resources/.github/workflows/move-pr-to-done-dependabot.yaml@a164168badaaadd037d3f0bf1dddf963dda5208a # v4
+    uses: senzing-factory/build-resources/.github/workflows/move-pr-to-done-dependabot.yaml@b4d8b531b66da53dcaef71a70285de492eff4c2b # v4
     with:
       project: ${{ vars.PLACEKEY_PROJECT_PLACEKEY }}

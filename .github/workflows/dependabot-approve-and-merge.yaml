@@ -17,4 +17,4 @@ jobs:
       pull-requests: write
     secrets:
       CODEOWNER_PR_RW_TOKEN: ${{ secrets.PLACEKEY_GITHUB_CODEOWNER_PR_RW_TOKEN }}
-    uses: senzing-factory/build-resources/.github/workflows/dependabot-approve-and-merge.yaml@a164168badaaadd037d3f0bf1dddf963dda5208a # v4
+    uses: senzing-factory/build-resources/.github/workflows/dependabot-approve-and-merge.yaml@b4d8b531b66da53dcaef71a70285de492eff4c2b # v4
