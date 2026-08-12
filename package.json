@@ -16,7 +16,7 @@
     "@google/clasp": "^3.3.0",
     "eslint": "^10.4.1",
     "happy-dom": "^20.9.0",
-    "prettier": "^3.8.5",
+    "prettier": "^3.9.6",
     "vitest": "^4.1.9"
   },
   "overrides": {
