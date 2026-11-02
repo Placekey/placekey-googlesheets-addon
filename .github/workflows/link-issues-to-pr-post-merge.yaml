@@ -13,4 +13,4 @@ jobs:
     permissions:
       pull-requests: write
       contents: read
-    uses: senzing-factory/build-resources/.github/workflows/link-issues-to-pull-request-post-merge.yaml@337e14c07a5ba1c8461d0f56c780dd5d829397f6 # v4
+    uses: senzing-factory/build-resources/.github/workflows/link-issues-to-pull-request-post-merge.yaml@c7026cb0f46f038b2ca967ab6cb9eb3825e9f80a # v4
