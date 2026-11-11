@@ -16,4 +16,4 @@ jobs:
       MEMBERS: ${{ secrets.PLACEKEY_MEMBERS }}
       ORG_MEMBERSHIP_TOKEN: ${{ secrets.ORG_MEMBERSHIP_TOKEN }}
       SLACK_WEBHOOK_URL: ${{ secrets.PLACEKEY_DEVOPS_SLACK_WEBHOOK_URL }}
-    uses: senzing-factory/build-resources/.github/workflows/add-labels-to-issue.yaml@03a3f1eb8a021cefeb7db484cb63a56549a4c9d6 # 4.10.2
+    uses: senzing-factory/build-resources/.github/workflows/add-labels-to-issue.yaml@35bd53b01ab78531dfc265f8b547fd9d218c67c7 # 4.10.3
